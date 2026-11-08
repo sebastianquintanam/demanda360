@@ -67,12 +67,13 @@ def create_app(config_object=Config) -> Flask:
             return respuesta_error(401, "NO_AUTENTICADO", "Debes iniciar sesión.")
         return redirect(url_for("auth.login", next=request.path))
 
-    from .routes import analitica, auth, inventario, sistema, vistas
+    from .routes import analitica, auth, inventario, pedidos, sistema, vistas
 
     app.register_blueprint(auth.bp)
     app.register_blueprint(sistema.bp)
     app.register_blueprint(inventario.bp)
     app.register_blueprint(analitica.bp)
+    app.register_blueprint(pedidos.bp)
     app.register_blueprint(vistas.bp)
     registrar_manejadores(app)
 

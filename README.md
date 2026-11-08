@@ -79,6 +79,16 @@ docker compose exec web flask aplicar-vistas
 - **Los datos demo no se editan a mano:** se cambia `database/seeds/generar_demo.py` y se regenera `10_demo.sql` con `python3 database/seeds/generar_demo.py`.
 - **Volver a cargar desde cero** exige base vacía: `docker compose down -v` borra también n8n (exporta antes tu flujo).
 
+## Pantallas
+
+| Pantalla | Plantilla (Flask) | Prototipo (mocks, Live Server) | Lógica compartida |
+| --- | --- | --- | --- |
+| Dashboard | `frontend/templates/dashboard.html` | `frontend/prototipo/dashboard.html` | `static/js/dashboard.js` |
+| Registro | `frontend/templates/registro.html` | `frontend/prototipo/registro.html` | `static/js/registro.js` |
+| Planificación | `frontend/templates/planificacion.html` | `frontend/prototipo/planificacion.html` | `static/js/planificacion.js` |
+
+Los prototipos y las plantillas cargan los mismos `static/js/comun.js` y `static/js/<pantalla>.js`. En el prototipo, «Ver como» cambia el rol.
+
 ## Alertas a n8n
 
 La venta que cruza el umbral crea la alerta y Flask la envía a n8n después de guardar la venta. Contrato completo: `docs/api/contrato.md`.
