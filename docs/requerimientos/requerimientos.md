@@ -6,7 +6,7 @@
 | Documento | Matriz de requerimientos funcionales (RF) y no funcionales (RNF) |
 | Versión | 1.1 |
 | Fecha | 8 de noviembre de 2026 |
-| Elaborado por | Jhonatan Stiben Rey Velásquez (Rol 4: frontend, prototipos, BPMN y requerimientos) |
+| Elaborado por | Jhonatan Stiben Rey Velásquez (frontend, prototipos, BPMN y requerimientos) |
 | Estado | En revisión con Quintana (Rol 1) |
 | Documento relacionado | [Trazabilidad de riesgos](trazabilidad_riesgos.md) |
 
@@ -80,7 +80,7 @@ La columna «Evidencia» de las matrices usa estos códigos. Solo se listan evid
 | EV-07 | Revisión visual del Rol 4 (8 nov 2026) de Dashboard, Registro y Planificación con ambos roles; consola de Planificación sin errores durante la carga | Sin registro guardado | No hay captura de esta revisión. |
 | EV-08 | Reporte de Quintana: con cobertura de 7 días, el sugerido total pasa de 54 a 24 unidades | Sin registro guardado | Sin captura. Es un dato reportado. |
 | EV-09 | PR #5 (Dashboard y Registro con la API real) y PR #6 (pedidos P1 y Planificación) | GitHub. Fusionados en `main`, según lo informado por el equipo. | Demuestran integración del código, no su funcionamiento. |
-| EV-10 | PR #4 (BPMN AS-IS v3) y PR #7 (BPMN TO-BE v3, SVG, vistas y justificación) | GitHub. El PR #4 está fusionado en `main`. El PR #7 se presentó desde `feature/frontend` y su estado (abierto o fusionado) está por verificar. | Evidencia documental. Mientras el PR #7 no se fusione, el TO-BE solo está en la rama `feature/frontend`. |
+| EV-10 | PR #4 (BPMN AS-IS v3) y PR #7 (BPMN TO-BE v3, SVG, vistas y justificación) | GitHub. Ambos PR están fusionados en `main`. El PR #7 se fusionó mediante el commit `68b616b`. | Evidencia documental de los BPMN integrados en `main`. No demuestra el funcionamiento del MVP. |
 | EV-11 | `backend/tests/test_kpi_demo.py`, nombrado en CONTRATO y README | Repositorio, según el CONTRATO y el README | Prueba declarada; no se ha revisado su resultado. |
 
 > Las capturas EV-01 a EV-06 se tomaron del prototipo antes de que Quintana pasara la lógica a los archivos compartidos de `frontend/static/js/`, así que pueden no reflejar exactamente la versión integrada. Si se suben al repositorio, por ejemplo junto con el prototipo o en una carpeta de evidencias, esta tabla debe actualizarse con la ruta comprobada.
