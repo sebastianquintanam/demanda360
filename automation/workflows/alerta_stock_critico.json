@@ -1,0 +1,212 @@
+{
+  "name": "Demanda360 - Alerta de stock crítico",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "alerta-stock-critico",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "aa2a7e74-ca53-4b0c-8f54-123bd6333eaa",
+      "name": "Webhook",
+      "webhookId": "160e57a5-3b94-4fca-9827-1a60409a5d51"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fe6c5920-5315-4759-99f4-0065e7adaf49",
+              "name": "asunto",
+              "value": "={{ \"Demanda360 - Stock crítico: \" + $json.body.producto.nombre }}",
+              "type": "string"
+            },
+            {
+              "id": "cf86d7ac-dbba-4761-a047-9c6b85cb0dbb",
+              "name": "mensaje",
+              "value": "={{ \"ALERTA DE INVENTARIO\\n\\nProducto: \" + $json.body.producto.nombre + \"\\nSKU: \" + $json.body.producto.sku + \"\\nExistencias: \" + $json.body.producto.saldo + \"\\nUmbral: \" + $json.body.producto.umbral + \"\\nEntrega estimada: \" + $json.body.producto.plazo_entrega_dias + \" días\\n\\nSe recomienda revisar la reposición. La compra requiere aprobación del propietario.\\n\\nDatos simulados - Demanda360\" }}",
+              "type": "string"
+            },
+            {
+              "id": "46bc27cd-de64-4b35-8f72-64497522166c",
+              "name": "evento_id",
+              "value": "={{ $json.body.evento_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        672,
+        0
+      ],
+      "id": "f902b01b-2fc3-4338-a0d4-771bc707244e",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "fromEmail": "remitente@example.com",
+        "toEmail": "destinatario@example.com",
+        "subject": "={{ $json.asunto }}",
+        "emailFormat": "text",
+        "text": "={{ $json.mensaje + '\\n\\nID del evento: ' + $json.evento_id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        896,
+        0
+      ],
+      "id": "d7f46a80-6807-4ac3-abba-fb70ca50e530",
+      "name": "Send an Email",
+      "webhookId": "8f466b55-ef69-463a-a00a-6efa049aff96",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "7e48faa7-abad-454c-b80f-8835b8348eac",
+              "leftValue": "={{ $json.body.tipo }}",
+              "rightValue": "STOCK_CRITICO",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        224,
+        0
+      ],
+      "id": "ae49daee-9eab-4f05-90e8-aba9c575094f",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ {\n  ok: true,\n  estado: \"ENVIADA\",\n  evento_id: $(\"Edit Fields\").first().json.evento_id\n} }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1120,
+        0
+      ],
+      "id": "ab7db44d-27ac-4b81-867b-c22247ba78f8",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"ok\": false,\n  \"error\": \"SMTP_SEND_FAILED\"\n}",
+        "options": {
+          "responseCode": 502
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1168,
+        144
+      ],
+      "id": "7c6f0f1b-e2e3-4a6d-9096-4afb492a477f",
+      "name": "Respuesta error SMTP"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an Email": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respuesta error SMTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "812a823f-5981-4fd4-9123-09eb0470e89b",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "id": "Vn4eVIzOuMCpUG5Q",
+  "tags": []
+}
