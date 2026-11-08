@@ -1,0 +1,590 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Registro · Pinturas By-plus</title>
+  <link rel="stylesheet" href="../static/css/estilos.css">
+  <!-- Estilos propios mínimos: rejilla de formularios, campos con error y caja de resultado.
+       Colores y componentes salen de estilos.css. -->
+  <style>
+    .formularios { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; align-items: start; }
+    .fila-campos { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+    .acciones { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+    .opcion { display: flex; align-items: center; gap: 8px; margin: 12px 0 4px; color: var(--color-texto); }
+    .opcion input { width: auto; margin: 0; }
+    .saldo-producto { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+    .campo-error { border-color: var(--agotado-texto) !important; }
+    .msg-campo { color: var(--agotado-texto); font-size: 12px; margin-top: 4px; }
+    .resultado { margin-top: 16px; padding: 12px; border-radius: 8px; background: var(--normal-fondo); }
+    .resultado dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; margin: 8px 0 0; }
+    .resultado dt { color: var(--color-texto-suave); }
+    .resultado .subtitulo { margin-top: 12px; font-weight: 600; }
+    .resultado dd { margin: 0; }
+    .aviso-mock { background: var(--simulado-fondo); color: var(--simulado-texto); }
+    .ref { font-family: monospace; font-size: 11px; word-break: break-all; }
+    fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+    fieldset[disabled] { opacity: 0.6; }
+    @media (max-width: 760px) { .layout { flex-direction: column; } .sidebar { width: auto; } .contenido { padding: 16px; } }
+  </style>
+</head>
+<!-- data-rol lo pone base.html en Flask. En el prototipo "" = vista de trabajador. -->
+<body data-rol="">
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="marca">
+        <div class="marca-icono" aria-hidden="true">◫</div>
+        <div>
+          <div class="marca-nombre">Demanda360</div>
+          <div class="marca-sub">Pinturas By-plus</div>
+        </div>
+      </div>
+      <nav class="menu">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="registro.html" class="activo">Registro</a>
+        <a href="planificacion.html">Planificación de pedidos</a>
+      </nav>
+      <div class="sidebar-pie">
+        <div class="usuario">Prototipo (sin sesión)</div>
+        <!-- Solo prototipo: permite ver la pantalla con cada rol. En Flask no existe;
+             el rol sale de la sesión y el backend responde 403 si no tiene permiso. -->
+        <label for="ver-como" style="color:#cbd5e1">Ver como (solo prototipo)</label>
+        <select id="ver-como">
+          <option value="">Trabajador</option>
+          <option value="propietario">Propietario</option>
+        </select>
+      </div>
+    </aside>
+
+    <main class="contenido">
+      <header class="encabezado">
+        <div>
+          <h1>Registro</h1>
+          <p class="subtitulo">Atenciones a clientes, conteos físicos y movimientos de inventario</p>
+        </div>
+        <span class="etiqueta etiqueta-simulado" id="etiqueta-simulado" hidden>Datos simulados</span>
+      </header>
+
+      <div class="alerta aviso-mock" id="aviso-mock" hidden>
+        <strong>Modo prototipo: las respuestas son simuladas.</strong>
+        Cada botón «Registrar» devuelve siempre el mismo ejemplo de <code>static/mock/</code>, sin importar lo que envíes.
+        Nada se guarda en la base de datos y el saldo de la lista no cambia. Los errores 400, 403 y 409 solo aparecen con el backend real.
+      </div>
+
+      <div class="alerta alerta-error" id="error-productos" hidden></div>
+
+      <div class="formularios">
+        <!-- ============ 1. Atención al cliente → POST /api/ventas ============ -->
+        <section class="tarjeta">
+          <h2>Atención al cliente</h2>
+          <p class="nota">Registra lo que el cliente pidió y lo que se le entregó. La diferencia queda como demanda no atendida.</p>
+          <form id="form-venta" novalidate>
+            <label for="venta-producto">Producto</label>
+            <select id="venta-producto" name="producto_id" class="selector-producto" required></select>
+            <div class="saldo-producto" data-saldo-de="venta-producto"></div>
+
+            <div class="fila-campos">
+              <div>
+                <label for="venta-solicitada">Cantidad solicitada</label>
+                <input id="venta-solicitada" name="cantidad_solicitada" type="number" min="1" step="1" inputmode="numeric" required>
+              </div>
+              <div>
+                <label for="venta-entregada">Cantidad entregada</label>
+                <input id="venta-entregada" name="cantidad_entregada" type="number" min="0" step="1" inputmode="numeric" required>
+              </div>
+            </div>
+
+            <label class="opcion">
+              <input type="checkbox" id="venta-regreso">
+              El cliente regresa por lo que faltó en una atención anterior
+            </label>
+            <div id="bloque-regreso" hidden>
+              <label for="venta-previa">Número de la atención original (<code>solicitud_id</code>)</label>
+              <input id="venta-previa" name="solicitud_previa_id" type="number" min="1" step="1" inputmode="numeric">
+              <p class="nota">Es el número que aparece como «Atención n.º» al registrar la atención original.
+                Todavía no hay una búsqueda de atenciones anteriores. Esta venta no suma demanda nueva.</p>
+            </div>
+
+            <div class="alerta alerta-error" data-error hidden></div>
+            <div class="acciones">
+              <button type="reset" class="boton">Limpiar</button>
+              <button type="submit" class="boton boton-primario">Registrar atención</button>
+            </div>
+            <p class="nota">Referencia del formulario (evita duplicados): <span class="ref" data-ref></span></p>
+          </form>
+          <div data-resultado></div>
+        </section>
+
+        <!-- ============ 2. Conteo físico → POST /api/conteos ============ -->
+        <section class="tarjeta">
+          <h2>Conteo físico</h2>
+          <p class="nota">Unidades contadas en la tienda. El conteo es una foto: reemplaza el saldo, no se suma.</p>
+          <form id="form-conteo" novalidate>
+            <label for="conteo-producto">Producto</label>
+            <select id="conteo-producto" name="producto_id" class="selector-producto" required></select>
+            <div class="saldo-producto" data-saldo-de="conteo-producto"></div>
+
+            <label for="conteo-cantidad">Cantidad contada</label>
+            <input id="conteo-cantidad" name="cantidad_contada" type="number" min="0" step="1" inputmode="numeric" required>
+
+            <div class="alerta alerta-error" data-error hidden></div>
+            <div class="acciones">
+              <button type="reset" class="boton">Limpiar</button>
+              <button type="submit" class="boton boton-primario">Registrar conteo</button>
+            </div>
+          </form>
+          <div data-resultado></div>
+        </section>
+
+        <!-- ============ 3. Entrada o ajuste → POST /api/movimientos ============ -->
+        <section class="tarjeta">
+          <h2>Entrada o ajuste</h2>
+          <p class="nota">Entrada: mercancía que llegó. Ajuste (solo propietario): corrección con justificación.</p>
+          <form id="form-movimiento" novalidate>
+            <label for="mov-producto">Producto</label>
+            <select id="mov-producto" name="producto_id" class="selector-producto" required></select>
+            <div class="saldo-producto" data-saldo-de="mov-producto"></div>
+
+            <label>Tipo de movimiento</label>
+            <label class="opcion"><input type="radio" name="tipo" value="ENTRADA" checked> Entrada de mercancía</label>
+            <label class="opcion solo-propietario"><input type="radio" name="tipo" value="AJUSTE"> Ajuste de inventario</label>
+
+            <label for="mov-cantidad" id="mov-cantidad-label">Cantidad recibida</label>
+            <input id="mov-cantidad" name="cantidad" type="number" step="1" inputmode="numeric" required>
+            <p class="nota" id="mov-cantidad-ayuda" data-ayuda="cantidad">Entero mayor que 0.</p>
+
+            <div id="bloque-justificacion" class="solo-propietario" hidden>
+              <label for="mov-justificacion">Justificación del ajuste</label>
+              <textarea id="mov-justificacion" name="justificacion" rows="3" maxlength="500"></textarea>
+            </div>
+
+            <div class="alerta alerta-error" data-error hidden></div>
+            <div class="acciones">
+              <button type="reset" class="boton">Limpiar</button>
+              <button type="submit" class="boton boton-primario">Registrar movimiento</button>
+            </div>
+            <p class="nota">Referencia del formulario (evita duplicados): <span class="ref" data-ref></span></p>
+          </form>
+          <div data-resultado></div>
+        </section>
+      </div>
+
+      <!-- ============ 4. Crear producto (P0) → POST /api/productos · PENDIENTE ============ -->
+      <section class="tarjeta solo-propietario">
+        <h2>Crear producto <span class="etiqueta etiqueta-critico">Pendiente</span></h2>
+        <div class="alerta aviso-mock">
+          Este formulario es P0 y queda <strong>deshabilitado por ahora</strong>: el contrato pide <code>categoria_id</code> y
+          <code>proveedor_id</code>, pero todavía no hay una ruta ni un mock que liste las categorías y los proveedores.
+          Se habilita cuando el backend (Quintana) defina cómo obtener esas listas. No se inventan identificadores.
+        </div>
+        <fieldset disabled aria-describedby="nota-producto">
+          <div class="fila-campos">
+            <div><label for="p-sku">SKU</label><input id="p-sku" name="sku"></div>
+            <div><label for="p-nombre">Nombre</label><input id="p-nombre" name="nombre"></div>
+            <div><label for="p-categoria">Categoría</label><select id="p-categoria" name="categoria_id"><option>Sin lista disponible</option></select></div>
+            <div><label for="p-proveedor">Proveedor habitual</label><select id="p-proveedor" name="proveedor_id"><option>Sin lista disponible</option></select></div>
+            <div><label for="p-marca">Marca</label><input id="p-marca" name="marca"></div>
+            <div><label for="p-presentacion">Presentación</label><input id="p-presentacion" name="presentacion"></div>
+            <div><label for="p-unidad">Unidad de medida</label><input id="p-unidad" name="unidad_medida"></div>
+            <div><label for="p-umbral">Umbral de reposición</label><input id="p-umbral" name="umbral_reposicion" type="number"></div>
+            <div><label for="p-costo">Costo de compra</label><input id="p-costo" name="costo_compra" type="number"></div>
+            <div><label for="p-precio">Precio de venta</label><input id="p-precio" name="precio_venta" type="number"></div>
+          </div>
+          <div class="acciones"><button type="button" class="boton boton-primario">Guardar producto</button></div>
+        </fieldset>
+        <p class="nota" id="nota-producto">Campos tomados del ejemplo «Crear producto» del contrato de API.</p>
+      </section>
+    </main>
+  </div>
+
+  <!-- Prototipo: fuerza los mocks de /static/mock (Live Server con la carpeta frontend/ como raíz) -->
+  <script>window.USE_MOCK = true;</script>
+  <script src="../static/js/api.js"></script>
+  <script>
+    /* La pantalla solo valida el formato de lo que se escribe y MUESTRA lo que responde la API.
+       Las reglas de negocio (saldo suficiente, permisos, estados) las decide el backend.
+       Todo dato se inserta con textContent (nunca innerHTML). */
+
+    const ESTADOS = {
+      SIN_CONTEO:          { texto: "Sin conteo",          clase: "etiqueta-normal" },
+      AGOTADO:             { texto: "Agotado",             clase: "etiqueta-agotado" },
+      CRITICO:             { texto: "Crítico",             clase: "etiqueta-critico" },
+      DATOS_INSUFICIENTES: { texto: "Datos insuficientes", clase: "etiqueta-datos-insuficientes" },
+      BAJA_ROTACION:       { texto: "Baja rotación",       clase: "etiqueta-baja-rotacion" },
+      NORMAL:              { texto: "Normal",              clase: "etiqueta-normal" },
+    };
+
+    let productos = [];
+
+    function el(etiqueta, clase, texto) {
+      const nodo = document.createElement(etiqueta);
+      if (clase) nodo.className = clase;
+      if (texto !== undefined && texto !== null) nodo.textContent = String(texto);
+      return nodo;
+    }
+
+    // Contrato: saldo null = el producto aún no tiene conteo. Nunca se muestra como 0.
+    function textoSaldo(saldo) {
+      return saldo === null || saldo === undefined ? "Sin conteo" : saldo;
+    }
+
+    function etiquetaEstado(codigo) {
+      const e = ESTADOS[codigo] || { texto: codigo || "—", clase: "etiqueta-normal" };
+      return el("span", "etiqueta " + e.clase, e.texto);
+    }
+
+    /* ---------- Rol (solo visual; el backend responde 403 igual) ---------- */
+    function esPropietario() { return document.body.dataset.rol === "propietario"; }
+
+    function aplicarRol() {
+      // Si el trabajador tenía "Ajuste" marcado, vuelve a "Entrada"
+      if (!esPropietario()) {
+        document.querySelector('#form-movimiento input[value="ENTRADA"]').checked = true;
+      }
+      actualizarTipoMovimiento();
+    }
+
+    document.getElementById("ver-como").addEventListener("change", (e) => {
+      document.body.dataset.rol = e.target.value;
+      aplicarRol();
+    });
+
+    /* ---------- Lista de productos (GET /api/productos) ---------- */
+    function pintarSaldo(select) {
+      const cont = document.querySelector(`[data-saldo-de="${select.id}"]`);
+      cont.replaceChildren();
+      const p = productos.find((x) => String(x.id) === select.value);
+      if (!p) return;
+      cont.appendChild(el("span", "nota", "Saldo actual: " + textoSaldo(p.saldo)));
+      cont.appendChild(etiquetaEstado(p.estado));
+    }
+
+    function llenarSelectores() {
+      document.querySelectorAll(".selector-producto").forEach((select) => {
+        const elegido = select.value;
+        select.replaceChildren(el("option", null, "Selecciona un producto…"));
+        select.firstChild.value = "";
+        productos.forEach((p) => {
+          const op = el("option", null, `${p.sku} · ${p.nombre}`);
+          op.value = String(p.id);
+          select.appendChild(op);
+        });
+        select.value = elegido;
+        pintarSaldo(select);
+      });
+    }
+
+    async function cargarProductos() {
+      const caja = document.getElementById("error-productos");
+      let r;
+      try {
+        r = await apiGet("/api/productos");
+      } catch (e) {
+        r = { ok: false, error: { mensaje: "No se pudo leer la lista de productos." } };
+      }
+      if (!r.ok) {
+        caja.textContent = (r.error && r.error.mensaje) || "No se pudo cargar la lista de productos.";
+        caja.hidden = false;
+        return;
+      }
+      caja.hidden = true;
+      productos = (r.data && r.data.productos) || [];
+      document.getElementById("etiqueta-simulado").hidden = !(r.data && r.data.origen_datos === "SIMULADO");
+      llenarSelectores();
+    }
+
+    document.querySelectorAll(".selector-producto").forEach((s) => s.addEventListener("change", () => pintarSaldo(s)));
+
+    /* ---------- Validación y errores de formulario ---------- */
+    const ENTERO = /^-?\d+$/;
+
+    function limpiarErrores(form) {
+      form.querySelectorAll(".campo-error").forEach((c) => { c.classList.remove("campo-error"); c.removeAttribute("aria-invalid"); });
+      form.querySelectorAll(".msg-campo").forEach((m) => m.remove());
+      form.querySelectorAll("[data-ayuda]").forEach((a) => { a.hidden = false; });
+      const caja = form.querySelector("[data-error]");
+      caja.hidden = true;
+      caja.textContent = "";
+    }
+
+    function marcarCampo(form, nombre, mensaje) {
+      const campo = form.querySelector(`[name="${nombre}"]`);
+      if (!campo) return false;
+      campo.classList.add("campo-error");
+      campo.setAttribute("aria-invalid", "true");
+      if (mensaje) {
+        // Si el campo tiene texto de ayuda, se oculta mientras se muestra el error (evita el mensaje duplicado)
+        const ayuda = form.querySelector(`[data-ayuda="${nombre}"]`);
+        if (ayuda) ayuda.hidden = true;
+        campo.insertAdjacentElement("afterend", el("div", "msg-campo", mensaje));
+      }
+      return true;
+    }
+
+    function mostrarErrores(form, mensaje, campos) {
+      const caja = form.querySelector("[data-error]");
+      caja.textContent = mensaje || "Revisa los datos del formulario.";
+      caja.hidden = false;
+      Object.keys(campos || {}).forEach((nombre) => marcarCampo(form, nombre));
+    }
+
+    /** Lee un entero de un input. Devuelve null si está vacío o no es entero. */
+    function leerEntero(form, nombre) {
+      const v = form.querySelector(`[name="${nombre}"]`).value.trim();
+      return ENTERO.test(v) ? Number(v) : null;
+    }
+
+    /* ---------- origen_ref: uno nuevo al abrir y tras cada registro exitoso ---------- */
+    const refs = {};
+    function renovarRef(form) {
+      refs[form.id] = nuevoOrigenRef();
+      const span = form.querySelector("[data-ref]");
+      if (span) span.textContent = refs[form.id];
+    }
+
+    /* ---------- Resultado ---------- */
+    function listaDatos(filas) {
+      const dl = document.createElement("dl");
+      filas.forEach(([nombre, valor]) => {
+        dl.appendChild(el("dt", null, nombre));
+        const dd = document.createElement("dd");
+        if (valor instanceof Node) dd.appendChild(valor); else dd.textContent = valor === null || valor === undefined ? "—" : String(valor);
+        dl.appendChild(dd);
+      });
+      return dl;
+    }
+
+    function nombreProducto(id) {
+      const p = productos.find((x) => x.id === id);
+      return p ? `${p.sku} · ${p.nombre}` : id;
+    }
+
+    /** enviados = lo que el usuario escribió y se mandó a la API; filas = lo que respondió la API. */
+    function pintarResultado(form, titulo, filas, status, enviados) {
+      const cont = form.parentElement.querySelector("[data-resultado]");
+      cont.replaceChildren();
+      const caja = el("div", "resultado");
+      const encabezado = el("strong", null, status === 200 ? titulo + " (ya estaba registrado: reenvío)" : titulo);
+      caja.appendChild(encabezado);
+      caja.appendChild(el("div", "subtitulo", "Datos enviados"));
+      caja.appendChild(listaDatos(enviados || []));
+      caja.appendChild(el("div", "subtitulo", USE_MOCK ? "Respuesta de la API (simulada)" : "Respuesta de la API"));
+      if (USE_MOCK) {
+        caja.appendChild(el("div", "nota",
+          "No se guardó en la base de datos y es siempre el mismo ejemplo, " +
+          "por eso puede no coincidir con los datos enviados."));
+      }
+      caja.appendChild(listaDatos(filas));
+      cont.appendChild(caja);
+    }
+
+    function limpiarResultado(form) {
+      form.parentElement.querySelector("[data-resultado]").replaceChildren();
+    }
+
+    const fecha = new Intl.DateTimeFormat("es-CO", { dateStyle: "medium", timeStyle: "short", timeZone: "America/Bogota" });
+    function textoFecha(iso) {
+      const d = new Date(iso);
+      return isNaN(d) ? iso : fecha.format(d);
+    }
+
+    /** Envía el formulario: bloquea el botón para evitar doble clic y procesa la respuesta. */
+    async function enviar(form, ruta, cuerpo, alExito) {
+      const boton = form.querySelector('button[type="submit"]');
+      boton.disabled = true;
+      let r;
+      try {
+        r = await apiPost(ruta, cuerpo);
+      } catch (e) {
+        r = { ok: false, error: { mensaje: "No se pudo leer la respuesta del servidor.", campos: {} } };
+      } finally {
+        boton.disabled = false;
+      }
+      if (!r.ok) {
+        // 400 VALIDACION, 403 SIN_PERMISO, 409 STOCK_INSUFICIENTE…: se muestra el mensaje del backend.
+        // El origen_ref se conserva: si se corrige y reenvía, no se duplica.
+        mostrarErrores(form, r.error && r.error.mensaje, r.error && r.error.campos);
+        return;
+      }
+      form.dataset.conservarResultado = "1"; // el reset de abajo no debe borrar el resultado
+      form.reset();
+      alExito(r.data || {}, r.status, cuerpo);
+      renovarRef(form);
+      cargarProductos(); // con el backend real refresca el saldo; con mocks queda igual
+    }
+
+    /* ---------- 1. Atención al cliente ---------- */
+    const formVenta = document.getElementById("form-venta");
+    const chkRegreso = document.getElementById("venta-regreso");
+    chkRegreso.addEventListener("change", () => {
+      document.getElementById("bloque-regreso").hidden = !chkRegreso.checked;
+    });
+
+    formVenta.addEventListener("submit", (e) => {
+      e.preventDefault();
+      limpiarErrores(formVenta);
+      let ok = true;
+      const productoId = leerEntero(formVenta, "producto_id");
+      const solicitada = leerEntero(formVenta, "cantidad_solicitada");
+      const entregada = leerEntero(formVenta, "cantidad_entregada");
+      let previa = null;
+
+      if (productoId === null) { marcarCampo(formVenta, "producto_id", "Elige un producto."); ok = false; }
+      if (solicitada === null || solicitada < 1) { marcarCampo(formVenta, "cantidad_solicitada", "Entero mayor que 0."); ok = false; }
+      if (entregada === null || entregada < 0) { marcarCampo(formVenta, "cantidad_entregada", "Entero de 0 o más."); ok = false; }
+      else if (solicitada !== null && entregada > solicitada) { marcarCampo(formVenta, "cantidad_entregada", "No puede superar lo solicitado."); ok = false; }
+      if (chkRegreso.checked) {
+        previa = leerEntero(formVenta, "solicitud_previa_id");
+        if (previa === null || previa < 1) { marcarCampo(formVenta, "solicitud_previa_id", "Escribe el número de la atención original."); ok = false; }
+      }
+      if (!ok) return mostrarErrores(formVenta, "Revisa los campos marcados.");
+
+      enviar(formVenta, "/api/ventas", {
+        producto_id: productoId,
+        cantidad_solicitada: solicitada,
+        cantidad_entregada: entregada,
+        origen_ref: refs[formVenta.id],
+        solicitud_previa_id: previa,
+      }, (d, status, c) => {
+        const p = d.producto || {};
+        const enviados = [
+          ["Producto", nombreProducto(c.producto_id)],
+          ["Solicitada", c.cantidad_solicitada],
+          ["Entregada", c.cantidad_entregada],
+          ["Regreso (solicitud_previa_id)", c.solicitud_previa_id === null ? "No" : c.solicitud_previa_id],
+          ["origen_ref", c.origen_ref],
+        ];
+        pintarResultado(formVenta, "Atención registrada", [
+          ["Atención n.º", d.solicitud_id],
+          ["Movimiento n.º", d.movimiento_id],
+          ["Producto", p.sku],
+          ["No atendidas", d.no_atendida],
+          ["Saldo", `${textoSaldo(p.saldo_anterior)} → ${textoSaldo(p.saldo_actual)}`],
+          ["Umbral", p.umbral_reposicion],
+          ["Estado", etiquetaEstado(p.estado)],
+          ["Alerta", d.alerta ? d.alerta.estado : "Sin alerta"],
+        ], status, enviados);
+        chkRegreso.checked = false;
+        document.getElementById("bloque-regreso").hidden = true;
+      });
+    });
+
+    /* ---------- 2. Conteo físico ---------- */
+    const formConteo = document.getElementById("form-conteo");
+    formConteo.addEventListener("submit", (e) => {
+      e.preventDefault();
+      limpiarErrores(formConteo);
+      let ok = true;
+      const productoId = leerEntero(formConteo, "producto_id");
+      const contada = leerEntero(formConteo, "cantidad_contada");
+      if (productoId === null) { marcarCampo(formConteo, "producto_id", "Elige un producto."); ok = false; }
+      if (contada === null || contada < 0) { marcarCampo(formConteo, "cantidad_contada", "Entero de 0 o más."); ok = false; }
+      if (!ok) return mostrarErrores(formConteo, "Revisa los campos marcados.");
+
+      enviar(formConteo, "/api/conteos", {
+        producto_id: productoId,
+        cantidad_contada: contada,
+      }, (d, status, c) => {
+        const p = d.producto || {};
+        const enviados = [
+          ["Producto", nombreProducto(c.producto_id)],
+          ["Cantidad contada", c.cantidad_contada],
+        ];
+        pintarResultado(formConteo, "Conteo registrado", [
+          ["Conteo n.º", d.id],
+          ["Producto", p.sku],
+          ["Cantidad contada", d.cantidad_contada],
+          ["Fecha y hora", d.fecha_hora ? textoFecha(d.fecha_hora) : null],
+          ["Saldo actual", textoSaldo(p.saldo_actual)],
+          ["Estado", etiquetaEstado(p.estado)],
+        ], status, enviados);
+      });
+    });
+
+    /* ---------- 3. Entrada o ajuste ---------- */
+    const formMov = document.getElementById("form-movimiento");
+
+    function tipoMovimiento() {
+      return formMov.querySelector('input[name="tipo"]:checked').value;
+    }
+
+    function actualizarTipoMovimiento() {
+      const ajuste = tipoMovimiento() === "AJUSTE";
+      document.getElementById("bloque-justificacion").hidden = !ajuste;
+      document.getElementById("mov-cantidad-label").textContent = ajuste ? "Cantidad del ajuste" : "Cantidad recibida";
+      document.getElementById("mov-cantidad-ayuda").textContent = ajuste
+        ? "Entero distinto de 0: positivo suma, negativo resta (ej.: -2)."
+        : "Entero mayor que 0.";
+      document.getElementById("mov-cantidad").min = ajuste ? "" : "1";
+    }
+    formMov.querySelectorAll('input[name="tipo"]').forEach((r) => r.addEventListener("change", actualizarTipoMovimiento));
+
+    formMov.addEventListener("submit", (e) => {
+      e.preventDefault();
+      limpiarErrores(formMov);
+      let ok = true;
+      const tipo = tipoMovimiento();
+      const productoId = leerEntero(formMov, "producto_id");
+      const cantidad = leerEntero(formMov, "cantidad");
+      const justificacion = formMov.querySelector('[name="justificacion"]').value.trim();
+
+      if (productoId === null) { marcarCampo(formMov, "producto_id", "Elige un producto."); ok = false; }
+      if (tipo === "ENTRADA" && (cantidad === null || cantidad < 1)) { marcarCampo(formMov, "cantidad", "Entero mayor que 0."); ok = false; }
+      if (tipo === "AJUSTE") {
+        if (cantidad === null || cantidad === 0) { marcarCampo(formMov, "cantidad", "Entero distinto de 0."); ok = false; }
+        if (!justificacion) { marcarCampo(formMov, "justificacion", "El ajuste necesita justificación."); ok = false; }
+      }
+      if (!ok) return mostrarErrores(formMov, "Revisa los campos marcados.");
+
+      enviar(formMov, "/api/movimientos", {
+        producto_id: productoId,
+        tipo: tipo,
+        cantidad: cantidad,
+        justificacion: tipo === "AJUSTE" ? justificacion : null,
+        origen_ref: refs[formMov.id],
+      }, (d, status, c) => {
+        const p = d.producto || {};
+        const enviados = [
+          ["Producto", nombreProducto(c.producto_id)],
+          ["Tipo", c.tipo],
+          ["Cantidad", c.cantidad],
+          ["Justificación", c.justificacion || "—"],
+          ["origen_ref", c.origen_ref],
+        ];
+        pintarResultado(formMov, tipo === "AJUSTE" ? "Ajuste registrado" : "Entrada registrada", [
+          ["Movimiento n.º", d.id],
+          ["Tipo", d.tipo],
+          ["Producto", p.sku],
+          ["Cantidad", d.cantidad],
+          ["Justificación", d.justificacion || "—"],
+          ["Saldo", `${textoSaldo(p.saldo_anterior)} → ${textoSaldo(p.saldo_actual)}`],
+          ["Estado", etiquetaEstado(p.estado)],
+        ], status, enviados);
+        actualizarTipoMovimiento();
+      });
+    });
+
+    /* ---------- «Limpiar»: borra campos y errores, mantiene el mismo origen_ref ---------- */
+    [formVenta, formConteo, formMov].forEach((form) => {
+      form.addEventListener("reset", () => {
+        setTimeout(() => {
+          limpiarErrores(form);
+          if (form.dataset.conservarResultado) delete form.dataset.conservarResultado;
+          else limpiarResultado(form);
+          form.querySelectorAll(".selector-producto").forEach(pintarSaldo);
+          if (form === formVenta) document.getElementById("bloque-regreso").hidden = true;
+          if (form === formMov) actualizarTipoMovimiento();
+        });
+      });
+    });
+
+    /* ---------- Inicio ---------- */
+    document.getElementById("aviso-mock").hidden = !USE_MOCK;
+    renovarRef(formVenta);
+    renovarRef(formConteo);
+    renovarRef(formMov);
+    aplicarRol();
+    cargarProductos();
+  </script>
+</body>
+</html>

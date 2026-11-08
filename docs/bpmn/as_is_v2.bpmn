@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Def_Demanda360_ASIS" targetNamespace="http://bpmn.io/schema/bpmn" exporter="bpmn-js (https://demo.bpmn.io)" exporterVersion="18.31.1">
+  <bpmn:documentation>AS-IS: Proceso de planificación y generación de pedidos de Pinturas By-plus (Entregable 1, corregido). Pendientes por validar con los propietarios: disparador del inicio, plazo del temporizador, ruta tras el temporizador y fricción D.</bpmn:documentation>
+  <bpmn:collaboration id="Colab_ASIS">
+    <bpmn:participant id="Part_ByPlus" name="Pinturas By-plus" processRef="Proc_ASIS" />
+    <bpmn:participant id="Proveedor" name="Proveedor" />
+    <bpmn:messageFlow id="M_Solicitud" name="Solicitud de pedido" sourceRef="T_Pedido" targetRef="Proveedor" />
+    <bpmn:messageFlow id="M_Falta" name="Aviso de falta de disponibilidad" sourceRef="Proveedor" targetRef="EV_Falta" />
+    <bpmn:messageFlow id="M_Confirmacion" name="Confirmación y fecha estimada" sourceRef="Proveedor" targetRef="EV_Confirmacion" />
+    <bpmn:textAnnotation id="A_M">
+      <bpmn:text>M – El conteo de las existencias se realiza manualmente.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="AS_M" associationDirection="None" sourceRef="A_M" targetRef="T_Conteo" />
+    <bpmn:textAnnotation id="A_I">
+      <bpmn:text>I – Información: No se registran las ventas por producto, lo que dificulta identificar cuáles tienen mayor o menor rotación.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="AS_I" associationDirection="None" sourceRef="A_I" targetRef="T_Determinar" />
+    <bpmn:textAnnotation id="A_D">
+      <bpmn:text>D – Duplicidad potencial: La lista de compra podría tener que escribirse nuevamente para enviarla por WhatsApp. Esto está pendiente de confirmar con los propietarios.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="AS_D" associationDirection="None" sourceRef="A_D" targetRef="T_Lista" />
+    <bpmn:textAnnotation id="A_E">
+      <bpmn:text>E – Espera: Se debe esperar la respuesta del proveedor, pero todavía no se conoce cuánto tarda. La entrega suele tomar entre 2 y 5 días después de confirmar el pedido.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="AS_E" associationDirection="None" sourceRef="A_E" targetRef="GW_Espera" />
+    <bpmn:textAnnotation id="A_T">
+      <bpmn:text>T – Trazabilidad: No existe un registro organizado para hacer seguimiento a los pedidos, las respuestas de los proveedores y los productos agotados.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="AS_T" associationDirection="None" sourceRef="A_T" targetRef="T_Pedido" />
+    <bpmn:textAnnotation id="A_Ruta">
+      <bpmn:text>Si el proveedor no responde, se propone consultar a otro proveedor. Pendiente de confirmar con los propietarios.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="AS_Ruta" associationDirection="None" sourceRef="A_Ruta" targetRef="T_Alternativo" />
+  </bpmn:collaboration>
+  <bpmn:process id="Proc_ASIS" name="Planificación y generación de pedidos (AS-IS)" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_1">
+      <bpmn:lane id="Lane_Propietarios" name="Propietarios">
+        <bpmn:flowNodeRef>Inicio</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Conteo</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Determinar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>GW_Pedido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Fin_SinPedido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Lista</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Proveedor</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>GW_Une1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Pedido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>GW_Espera</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EV_Confirmacion</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Fin_Confirmado</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EV_Falta</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EV_Timer</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>GW_Une2</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Alternativo</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="Inicio" name="Necesidad de revisar el abastecimiento (motivo de inicio por confirmar)">
+      <bpmn:outgoing>F1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="T_Conteo" name="Realizar conteo físico de existencias">
+      <bpmn:incoming>F1</bpmn:incoming>
+      <bpmn:outgoing>F2</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="T_Determinar" name="Determinar productos y cantidades a solicitar">
+      <bpmn:incoming>F2</bpmn:incoming>
+      <bpmn:outgoing>F3</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="GW_Pedido" name="¿Es necesario realizar un pedido?">
+      <bpmn:incoming>F3</bpmn:incoming>
+      <bpmn:outgoing>F_No</bpmn:outgoing>
+      <bpmn:outgoing>F_Si</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="Fin_SinPedido" name="Fin sin pedido">
+      <bpmn:incoming>F_No</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:task id="T_Lista" name="Elaborar lista de compra">
+      <bpmn:incoming>F_Si</bpmn:incoming>
+      <bpmn:outgoing>F4</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="T_Proveedor" name="Seleccionar proveedor según producto y marca">
+      <bpmn:incoming>F4</bpmn:incoming>
+      <bpmn:outgoing>F5</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="GW_Une1">
+      <bpmn:incoming>F5</bpmn:incoming>
+      <bpmn:incoming>F13</bpmn:incoming>
+      <bpmn:outgoing>F5b</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="T_Pedido" name="Realizar pedido al proveedor">
+      <bpmn:incoming>F5b</bpmn:incoming>
+      <bpmn:outgoing>F6</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:eventBasedGateway id="GW_Espera" name="Esperar respuesta del proveedor">
+      <bpmn:incoming>F6</bpmn:incoming>
+      <bpmn:outgoing>F7</bpmn:outgoing>
+      <bpmn:outgoing>F8</bpmn:outgoing>
+      <bpmn:outgoing>F9</bpmn:outgoing>
+    </bpmn:eventBasedGateway>
+    <bpmn:intermediateCatchEvent id="EV_Confirmacion" name="Confirmación y fecha recibidas">
+      <bpmn:incoming>F7</bpmn:incoming>
+      <bpmn:outgoing>F10</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MED_Confirmacion" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:endEvent id="Fin_Confirmado" name="Pedido confirmado">
+      <bpmn:incoming>F10</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:intermediateCatchEvent id="EV_Falta" name="Falta de disponibilidad notificada">
+      <bpmn:incoming>F8</bpmn:incoming>
+      <bpmn:outgoing>F11</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MED_Falta" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:intermediateCatchEvent id="EV_Timer" name="No se recibe respuesta del proveedor (tiempo por definir)">
+      <bpmn:incoming>F9</bpmn:incoming>
+      <bpmn:outgoing>F12</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TED_SinRespuesta" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:exclusiveGateway id="GW_Une2">
+      <bpmn:incoming>F11</bpmn:incoming>
+      <bpmn:incoming>F12</bpmn:incoming>
+      <bpmn:outgoing>F14</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="T_Alternativo" name="Seleccionar proveedor alternativo">
+      <bpmn:incoming>F14</bpmn:incoming>
+      <bpmn:outgoing>F13</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="F1" sourceRef="Inicio" targetRef="T_Conteo" />
+    <bpmn:sequenceFlow id="F2" sourceRef="T_Conteo" targetRef="T_Determinar" />
+    <bpmn:sequenceFlow id="F3" sourceRef="T_Determinar" targetRef="GW_Pedido" />
+    <bpmn:sequenceFlow id="F_No" name="No" sourceRef="GW_Pedido" targetRef="Fin_SinPedido" />
+    <bpmn:sequenceFlow id="F_Si" name="Sí" sourceRef="GW_Pedido" targetRef="T_Lista" />
+    <bpmn:sequenceFlow id="F4" sourceRef="T_Lista" targetRef="T_Proveedor" />
+    <bpmn:sequenceFlow id="F5" sourceRef="T_Proveedor" targetRef="GW_Une1" />
+    <bpmn:sequenceFlow id="F13" sourceRef="T_Alternativo" targetRef="GW_Une1" />
+    <bpmn:sequenceFlow id="F5b" sourceRef="GW_Une1" targetRef="T_Pedido" />
+    <bpmn:sequenceFlow id="F6" sourceRef="T_Pedido" targetRef="GW_Espera" />
+    <bpmn:sequenceFlow id="F7" sourceRef="GW_Espera" targetRef="EV_Confirmacion" />
+    <bpmn:sequenceFlow id="F8" sourceRef="GW_Espera" targetRef="EV_Falta" />
+    <bpmn:sequenceFlow id="F9" sourceRef="GW_Espera" targetRef="EV_Timer" />
+    <bpmn:sequenceFlow id="F10" sourceRef="EV_Confirmacion" targetRef="Fin_Confirmado" />
+    <bpmn:sequenceFlow id="F11" sourceRef="EV_Falta" targetRef="GW_Une2" />
+    <bpmn:sequenceFlow id="F12" sourceRef="EV_Timer" targetRef="GW_Une2" />
+    <bpmn:sequenceFlow id="F14" sourceRef="GW_Une2" targetRef="T_Alternativo" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagram_ASIS">
+    <bpmndi:BPMNPlane id="Plane_ASIS" bpmnElement="Colab_ASIS">
+      <bpmndi:BPMNShape id="Part_ByPlus_di" bpmnElement="Part_ByPlus" isHorizontal="true">
+        <dc:Bounds x="160" y="60" width="2060" height="460" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Propietarios_di" bpmnElement="Lane_Propietarios" isHorizontal="true">
+        <dc:Bounds x="190" y="60" width="2030" height="460" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Inicio_di" bpmnElement="Inicio">
+        <dc:Bounds x="270" y="242" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="239" y="285" width="99" height="66" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Conteo_di" bpmnElement="T_Conteo">
+        <dc:Bounds x="360" y="220" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Determinar_di" bpmnElement="T_Determinar">
+        <dc:Bounds x="540" y="220" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GW_Pedido_di" bpmnElement="GW_Pedido" isMarkerVisible="true">
+        <dc:Bounds x="720" y="235" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="710" y="190" width="71" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Fin_SinPedido_di" bpmnElement="Fin_SinPedido">
+        <dc:Bounds x="727" y="372" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="709" y="415" width="72" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Lista_di" bpmnElement="T_Lista">
+        <dc:Bounds x="830" y="220" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Proveedor_di" bpmnElement="T_Proveedor">
+        <dc:Bounds x="1010" y="220" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GW_Une1_di" bpmnElement="GW_Une1" isMarkerVisible="true">
+        <dc:Bounds x="1165" y="235" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Pedido_di" bpmnElement="T_Pedido">
+        <dc:Bounds x="1260" y="220" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GW_Espera_di" bpmnElement="GW_Espera">
+        <dc:Bounds x="1440" y="235" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1384" y="292" width="76" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EV_Confirmacion_di" bpmnElement="EV_Confirmacion">
+        <dc:Bounds x="1560" y="152" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1475" y="124" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Fin_Confirmado_di" bpmnElement="Fin_Confirmado">
+        <dc:Bounds x="1692" y="152" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1664" y="195" width="92" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EV_Falta_di" bpmnElement="EV_Falta">
+        <dc:Bounds x="1560" y="242" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1528" y="198" width="100" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EV_Timer_di" bpmnElement="EV_Timer">
+        <dc:Bounds x="1560" y="362" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1521" y="402" width="114" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GW_Une2_di" bpmnElement="GW_Une2" isMarkerVisible="true">
+        <dc:Bounds x="1650" y="295" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Alternativo_di" bpmnElement="T_Alternativo">
+        <dc:Bounds x="1740" y="280" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A_M_di" bpmnElement="A_M">
+        <dc:Bounds x="310" y="85" width="191.7087994836489" height="43" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A_I_di" bpmnElement="A_I">
+        <dc:Bounds x="525" y="75" width="236.7147160068847" height="72" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A_D_di" bpmnElement="A_D">
+        <dc:Bounds x="820" y="75" width="216.71955679862307" height="86" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A_E_di" bpmnElement="A_E">
+        <dc:Bounds x="1275" y="75" width="191.7087994836489" height="100" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A_T_di" bpmnElement="A_T">
+        <dc:Bounds x="1050" y="75" width="216.71955679862307" height="86" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A_Ruta_di" bpmnElement="A_Ruta">
+        <dc:Bounds x="1890" y="290" width="132" height="100" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="F1_di" bpmnElement="F1">
+        <di:waypoint x="306" y="260" />
+        <di:waypoint x="360" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F2_di" bpmnElement="F2">
+        <di:waypoint x="480" y="260" />
+        <di:waypoint x="540" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F3_di" bpmnElement="F3">
+        <di:waypoint x="660" y="260" />
+        <di:waypoint x="720" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_No_di" bpmnElement="F_No">
+        <di:waypoint x="745" y="285" />
+        <di:waypoint x="745" y="372" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="752" y="315" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_Si_di" bpmnElement="F_Si">
+        <di:waypoint x="770" y="260" />
+        <di:waypoint x="830" y="260" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="790" y="242" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F4_di" bpmnElement="F4">
+        <di:waypoint x="950" y="260" />
+        <di:waypoint x="1010" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F5_di" bpmnElement="F5">
+        <di:waypoint x="1130" y="260" />
+        <di:waypoint x="1165" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F5b_di" bpmnElement="F5b">
+        <di:waypoint x="1215" y="260" />
+        <di:waypoint x="1260" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F6_di" bpmnElement="F6">
+        <di:waypoint x="1380" y="260" />
+        <di:waypoint x="1440" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F7_di" bpmnElement="F7">
+        <di:waypoint x="1465" y="235" />
+        <di:waypoint x="1465" y="170" />
+        <di:waypoint x="1560" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F8_di" bpmnElement="F8">
+        <di:waypoint x="1490" y="260" />
+        <di:waypoint x="1560" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F9_di" bpmnElement="F9">
+        <di:waypoint x="1465" y="285" />
+        <di:waypoint x="1465" y="380" />
+        <di:waypoint x="1560" y="380" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F10_di" bpmnElement="F10">
+        <di:waypoint x="1596" y="170" />
+        <di:waypoint x="1692" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F11_di" bpmnElement="F11">
+        <di:waypoint x="1578" y="278" />
+        <di:waypoint x="1578" y="320" />
+        <di:waypoint x="1650" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F12_di" bpmnElement="F12">
+        <di:waypoint x="1596" y="380" />
+        <di:waypoint x="1675" y="380" />
+        <di:waypoint x="1675" y="345" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F14_di" bpmnElement="F14">
+        <di:waypoint x="1700" y="320" />
+        <di:waypoint x="1740" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F13_di" bpmnElement="F13">
+        <di:waypoint x="1800" y="360" />
+        <di:waypoint x="1800" y="470" />
+        <di:waypoint x="1190" y="470" />
+        <di:waypoint x="1190" y="285" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="AS_M_di" bpmnElement="AS_M">
+        <di:waypoint x="404" y="128" />
+        <di:waypoint x="420" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="AS_I_di" bpmnElement="AS_I">
+        <di:waypoint x="628" y="147" />
+        <di:waypoint x="605" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="AS_D_di" bpmnElement="AS_D">
+        <di:waypoint x="897" y="161" />
+        <di:waypoint x="890" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="AS_E_di" bpmnElement="AS_E">
+        <di:waypoint x="1371" y="180" />
+        <di:waypoint x="1449" y="251" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="AS_T_di" bpmnElement="AS_T">
+        <di:waypoint x="1160" y="161" />
+        <di:waypoint x="1267" y="221" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="AS_Ruta_di" bpmnElement="AS_Ruta">
+        <di:waypoint x="1890" y="325" />
+        <di:waypoint x="1860" y="322" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Proveedor_di" bpmnElement="Proveedor" isHorizontal="true">
+        <dc:Bounds x="160" y="580" width="2060" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="M_Solicitud_di" bpmnElement="M_Solicitud">
+        <di:waypoint x="1320" y="300" />
+        <di:waypoint x="1320" y="580" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1306" y="486" width="88" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="M_Falta_di" bpmnElement="M_Falta">
+        <di:waypoint x="2050" y="580" />
+        <di:waypoint x="2050" y="260" />
+        <di:waypoint x="1596" y="260" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1958" y="420" width="86" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="M_Confirmacion_di" bpmnElement="M_Confirmacion">
+        <di:waypoint x="2110" y="580" />
+        <di:waypoint x="2110" y="110" />
+        <di:waypoint x="1578" y="110" />
+        <di:waypoint x="1578" y="152" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2116" y="420" width="86" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
