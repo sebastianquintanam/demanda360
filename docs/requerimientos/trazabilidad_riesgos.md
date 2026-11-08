@@ -6,7 +6,7 @@
 | Documento | Relación entre riesgos, controles, requerimientos y evidencias |
 | Versión | 1.1 |
 | Fecha | 8 de noviembre de 2026 |
-| Elaborado por | Jhonatan Stiben Rey Velásquez (Rol 4) |
+| Elaborado por | Jhonatan Stiben Rey Velásquez  |
 | Estado | En revisión con Quintana (Rol 1) y Brayan (Rol 2) |
 | Documento relacionado | [Requerimientos RF y RNF](requerimientos.md) |
 
@@ -115,7 +115,7 @@ Estas medidas del taller no se convierten en funcionalidades obligatorias del MV
 
 - Capturas de los prototipos con mocks (EV-01 a EV-06), guardadas en la carpeta compartida del proyecto. No se ha comprobado si están en GitHub.
 - Revisión visual del 8 de noviembre (EV-07), sin captura.
-- PR en GitHub: #4 (AS-IS), #5 y #6 (integración), fusionados en `main`; #7 (TO-BE), con su estado por verificar. Demuestran que hubo cambios, no que los controles funcionen.
+- PR en GitHub: #4 (AS-IS), #5 y #6 (integración), y #7 (TO-BE), todos fusionados en `main`. Demuestran la integración de los cambios, pero no que los controles funcionen         correctamente.
 
 **Faltantes:**
 
