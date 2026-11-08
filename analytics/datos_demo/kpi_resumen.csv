@@ -1,0 +1,6 @@
+﻿corte,periodo_desde,periodo_hasta,codigo,nombre,valor,unidad,numerador,denominador,detalle,mejor_si,origen_datos
+2026-09-30,2026-09-01,2026-09-30,KPI1,Referencias agotadas,27.3,%,3,11,3 de 11 referencias con conteo,menor,SIMULADO
+2026-09-30,2026-09-01,2026-09-30,KPI2,Demanda no atendida,8.6,%,12,139,12 de 139 unidades solicitadas,menor,SIMULADO
+2026-09-30,2026-09-01,2026-09-30,KPI3,Baja rotación,50.0,%,5,10,5 de 10; 1 referencia(s) con datos insuficientes,menor,SIMULADO
+2026-09-30,2026-09-01,2026-09-30,KPI4,Tiempo de confirmación del proveedor,4.7,horas,14.0,3,3 pedido(s) con respuesta; 2 enviado(s) sin respuesta (no se promedian),menor,SIMULADO
+2026-09-30,2026-09-01,2026-09-30,KPI5,Confirmados con el primer proveedor,66.7,%,2,3,2 de 3 pedidos confirmados lo fueron con el primer proveedor,mayor,SIMULADO
