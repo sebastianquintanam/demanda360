@@ -14,7 +14,7 @@
 | `POST /api/conteos`, `POST /api/ventas`, `POST /api/movimientos` | P0 | Implementadas (etapa 3) |
 | `GET /api/dashboard`, `GET /api/analisis/rotacion` | P0 | Implementadas (etapa 3) |
 | Alerta a n8n + `flask reintentar-alertas` | P0 | Implementada (etapa 3) |
-| Sugeridos y pedidos | P1 | Etapa 5 |
+| `GET /api/sugeridos`, `GET/POST /api/pedidos`, `/aprobar`, `/estado` | P1 | Implementadas |
 
 ## Precisiones de la etapa 1 (no cambian el plan)
 
@@ -39,6 +39,28 @@
 - **`GET /api/catalogos`** (ambos roles): `categorias`, `proveedores` (con `plazo_entrega_dias`) y `unidades_medida`, para los formularios de Registro. Mock: `catalogos.json`.
 - **Cliente que regresa:** `GET /api/productos/{id}` trae `faltantes_pendientes` (atenciones de los últimos 30 días con faltante sin cubrir). La pantalla deja escoger una y envía su `solicitud_id` como `solicitud_previa_id` en `POST /api/ventas`. Reglas: misma referencia, enlazada a la atención original (no a otro regreso) y `cantidad_solicitada` ≤ faltante pendiente; si no, 400.
 - **Sin sesión:** un `POST /api/*` sin sesión responde 401 antes que el chequeo de CSRF, así una sesión vencida lleva al login.
+- **KPI:** el texto explicativo de cada KPI va en `detalle` (no `nota`), como en `dashboard.json`.
+
+## Integración de pantallas
+
+- **Una sola copia de la lógica:** `frontend/static/js/comun.js`, `dashboard.js`, `registro.js` y `planificacion.js`. Las plantillas de Flask (`frontend/templates/`) y los prototipos (`frontend/prototipo/`, con mocks) cargan los mismos archivos. Un cambio de comportamiento se hace una vez.
+- **Diseño:** el Rol 4 sigue siendo dueño del prototipo y de `estilos.css`; las plantillas copian su HTML dentro de `base.html`.
+- **Registro:** el formulario de producto usa `GET /api/catalogos`; el cliente que regresa escoge la atención en una lista (`faltantes_pendientes`); el conteo envía `origen_ref`; el ajuste exige 10 caracteres de justificación también en pantalla.
+
+## Pedidos (P1) · precisiones
+
+- **`GET /api/sugeridos?cobertura=14`** (solo propietario; cobertura 1–90): la forma de `sugeridos.json` más `proveedor_id` y `proveedor`. Saldo de hoy, demanda del periodo de corte. `formula` explica cada número.
+- **`POST /api/pedidos`** (ambos roles): `{"proveedor_id", "cobertura_dias"?, "detalles": [{"producto_id", "cantidad_solicitada"}]}`. Crea un `BORRADOR`. La `cantidad_sugerida` de cada línea la calcula el servidor; si el cliente la envía, se ignora. Datos insuficientes → `null` (manual). Entre 1 y 50 líneas, sin productos repetidos.
+- **`POST /api/pedidos/{id}/aprobar`** (solo propietario): `BORRADOR → APROBADO`, y queda registrado quién aprobó.
+- **`POST /api/pedidos/{id}/estado`** (solo propietario), `{"estado": ...}`:
+  - `APROBADO → ENVIADO`: registra `fecha_envio`.
+  - `ENVIADO → CONFIRMADO`: registra `fecha_respuesta` y `fecha_entrega_estimada` (hoy + plazo del proveedor, o la que se envíe).
+  - `BORRADOR | APROBADO | ENVIADO → CANCELADO`: `motivo_cancelacion` obligatorio (5–300 caracteres). Con `reintentar_con_proveedor_id` (distinto del actual) se crea el reintento: un pedido nuevo con las mismas líneas, `numero_intento + 1`, `pedido_anterior_id`, ya `APROBADO` por el propietario que lo pidió. La respuesta lo trae en `"reintento"`. Un pedido se reintenta una sola vez.
+  - Cualquier otro salto responde **409 `TRANSICION_INVALIDA`**.
+- **`GET /api/pedidos`**: los últimos 100, del más nuevo al más viejo. Cada uno trae `reintento_id`, y en los `ENVIADO` sin respuesta, `horas_esperando` (horas desde el envío; no es el plazo de entrega).
+- **Confirmar no suma inventario:** la mercancía entra cuando llega, con Registro → Entrada.
+- **Sin `origen_ref`:** la tabla `pedidos` no lo tiene. La pantalla bloquea el botón mientras guarda; un borrador repetido se cancela.
+- **Auditoría:** `PEDIDO_CREADO`, `PEDIDO_APROBADO`, `PEDIDO_ENVIADO`, `PEDIDO_CONFIRMADO`, `PEDIDO_CANCELADO` y `PEDIDO_REINTENTO`.
 
 ## Alerta de stock crítico · contrato con n8n (cerrado el 8 nov 2026)
 
@@ -181,7 +203,7 @@ Si se intenta entregar más de lo disponible: `409 STOCK_INSUFICIENTE`, con el m
   "kpis": [
     { "codigo": "KPI1", "nombre": "Referencias agotadas", "valor": 27.3, "unidad": "%", "numerador": 3, "denominador": 11 },
     { "codigo": "KPI2", "nombre": "Demanda no atendida", "valor": 8.6, "unidad": "%", "numerador": 12, "denominador": 139 },
-    { "codigo": "KPI3", "nombre": "Baja rotación", "valor": 50.0, "unidad": "%", "numerador": 5, "denominador": 10, "nota": "1 referencia con datos insuficientes" }
+    { "codigo": "KPI3", "nombre": "Baja rotación", "valor": 50.0, "unidad": "%", "numerador": 5, "denominador": 10, "detalle": "5 de 10; 1 referencia con datos insuficientes" }
   ],
   "criticos": [
     { "id": 1, "sku": "LAC-BP-01", "nombre": "Laca catalizada alto brillo galón", "saldo": 0, "estado": "AGOTADO", "plazo_entrega_dias": 3 }

@@ -1,10 +1,93 @@
 {% extends "base.html" %}
+{# Diseño: docs/contexto/figma/planificacion_pedidos.png. Lógica: static/js/planificacion.js. #}
 {% block titulo %}Planificación de pedidos{% endblock %}
+{% block head %}
+<style>
+  .fila-cobertura { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .fila-cobertura input { width: 90px; }
+  .tabla input { width: 110px; }
+  .tabla td.sugerido { color: var(--color-texto-suave); }
+  .resumen { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 8px; }
+  .resumen .valor { font-size: 24px; font-weight: 700; }
+  .regla { background: var(--simulado-fondo); color: var(--simulado-texto); border-radius: 8px; padding: 12px; }
+  .regla ul { margin: 8px 0 0; padding-left: 18px; }
+  .acciones { display: flex; justify-content: flex-end; margin-top: 16px; }
+  .acciones-pedido { display: flex; gap: 6px; flex-wrap: wrap; }
+  .acciones-pedido .boton, form.cancelar .boton { padding: 6px 10px; font-size: 13px; }
+  form.cancelar { display: grid; gap: 6px; min-width: 220px; }
+  .boton-peligro { background: var(--agotado-texto); border-color: var(--agotado-texto); color: #fff; }
+  .etiqueta-confirmado { background: #dcfce7; color: #166534; }
+  .alerta-ok { background: #dcfce7; color: #166534; }
+  .campo-error { border-color: var(--agotado-texto) !important; }
+  section + section { margin-top: 16px; }
+</style>
+{% endblock %}
 {% block encabezado %}Planificación de pedidos{% endblock %}
-{% block subtitulo %}Cantidades sugeridas · aprobación del propietario{% endblock %}
+{% block subtitulo %}Cargando…{% endblock %}
 {% block contenido %}
-<section class="tarjeta">
-  <p>Pantalla en construcción. El diseño sale de <code>frontend/prototipo/planificacion.html</code> (Rol 4)
-  y se integra aquí en la etapa 6.</p>
+{% if current_user.rol == 'propietario' %}
+<section class="tarjeta solo-propietario">
+  <h2>Cobertura total</h2>
+  <p class="nota">Días que debe cubrir el pedido. El plazo de entrega no se suma: indica cuándo revisar. Unidades = envases de la presentación.</p>
+  <div class="fila-cobertura">
+    <label for="cobertura">Cobertura total (días)</label>
+    <input id="cobertura" type="number" min="1" max="90" step="1" value="14" inputmode="numeric">
+    <button type="button" class="boton" id="recalcular">Recalcular</button>
+  </div>
+  <div class="alerta alerta-error" id="aviso-sugeridos" role="alert" hidden></div>
 </section>
+
+<section class="tarjeta solo-propietario">
+  <h2>Productos prioritarios</h2>
+  <p class="nota">Existencias de hoy. Demanda del periodo de los indicadores. Pasa el cursor sobre el sugerido para ver su cálculo.</p>
+  <table class="tabla">
+    <thead>
+      <tr><th>Producto</th><th>Existencias</th><th>Demanda u/día</th><th>Entrega</th><th>Sugerido</th><th>Cantidad a pedir</th></tr>
+    </thead>
+    <tbody id="tabla-sugeridos"></tbody>
+  </table>
+</section>
+
+<section class="tarjeta solo-propietario">
+  <h2>Regla de cálculo</h2>
+  <div class="regla">
+    <div id="regla"></div>
+    <ul id="formulas"></ul>
+  </div>
+</section>
+
+<section class="tarjeta solo-propietario">
+  <h2>Resumen</h2>
+  <div class="resumen">
+    <div><div class="nota">Referencias prioritarias</div><div class="valor" id="res-prioritarias">—</div></div>
+    <div><div class="nota">Total sugerido</div><div class="valor" id="res-total-sugerido">—</div></div>
+    <div><div class="nota">Total en borrador</div><div class="valor" id="res-total-borrador">—</div></div>
+  </div>
+  <p class="nota">Guardar solo crea borradores (uno por proveedor habitual): no compra ni modifica el inventario. Cada borrador necesita tu aprobación.</p>
+  <div class="alerta" id="aviso-borrador" role="status" hidden></div>
+  <div class="acciones"><button type="button" class="boton boton-primario" id="guardar-borrador">Guardar borrador</button></div>
+</section>
+{% else %}
+<section class="tarjeta">
+  <p class="nota">Las cantidades sugeridas y la aprobación de pedidos son del propietario. Aquí puedes ver el estado de los pedidos.</p>
+</section>
+{# Elementos que el script espera aunque el trabajador no los vea #}
+<div hidden><input id="cobertura" value="14"><button id="recalcular" type="button"></button><button id="guardar-borrador" type="button"></button></div>
+{% endif %}
+
+<section class="tarjeta">
+  <h2>Pedidos</h2>
+  <p class="nota">Confirmar un pedido no suma inventario: la mercancía entra cuando llega (Registro → Entrada). «Esperando respuesta» son horas desde el envío, no el plazo de entrega.</p>
+  <div class="alerta" id="aviso-pedidos" role="status" hidden></div>
+  <table class="tabla">
+    <thead>
+      <tr><th>N.º</th><th>Proveedor</th><th>Estado</th><th>Productos</th><th>Fechas</th><th></th></tr>
+    </thead>
+    <tbody id="tabla-pedidos"></tbody>
+  </table>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/comun.js') }}"></script>
+<script src="{{ url_for('static', filename='js/planificacion.js') }}"></script>
 {% endblock %}
