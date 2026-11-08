@@ -5,7 +5,7 @@ Caso: Pinturas By-plus · Responsable de elaboración: rol 3 · Fecha: 8 de novi
 
 ## Alcance y estado
 
-Estas fichas desarrollan los cinco indicadores definidos en el plan del MVP. Los nombres de las vistas SQL indican la fuente prevista; sus resultados deberán comprobarse cuando el líder entregue las vistas y los CSV. Documentar un indicador no demuestra que su cálculo esté implementado.
+Estas fichas desarrollan los cinco indicadores definidos en el plan del MVP. La auditoría de Sebastián del 8 de noviembre de 2026 informa que las vistas de KPI y los CSV están implementados. El cotejo del rol 3 confirma que los cinco resultados guardados en Excel coinciden con los CSV de septiembre al mostrarlos con un decimal. La ejecución de las consultas SQL y de las pruebas del backend no forma parte de este cotejo.
 
 El historial de septiembre de 2026 es **SIMULADO**. Los valores de demostración no constituyen una línea base real ni prueban reducción de agotamientos, ahorros o mejoras en el negocio. Los datos reales se conservarán separados de los simulados.
 
@@ -26,7 +26,7 @@ El historial de septiembre de 2026 es **SIMULADO**. Los valores de demostración
 | 2. Objetivo | Mejorar la disponibilidad e identificar las referencias que requieren revisión de reposición. |
 | 3. Fórmula | (Referencias con saldo verificado igual a cero al corte / referencias monitoreadas con conteo verificado al corte) × 100. |
 | 4. Unidad | Porcentaje (%). |
-| 5. Fuente | Catálogo `productos`, `conteos_fisicos` y `movimientos`. El saldo se obtiene del último conteo y los movimientos posteriores hasta el corte. Vista prevista: `vw_kpi_agotadas`. |
+| 5. Fuente | Catálogo `productos`, `conteos_fisicos` y `movimientos`. El saldo se obtiene del último conteo y los movimientos posteriores hasta el corte. Vista de referencia: `vw_kpi_agotadas`. |
 | 6. Frecuencia | Mensual, con fecha de corte explícita al cierre del período. |
 | 7. Meta | Reducir un 20 % relativo frente a la primera línea base real validada. Meta provisional; valor inicial real pendiente de medición. |
 | 8. Responsable | Propietarios. El personal registra conteos y movimientos; el rol 3 verifica el cálculo durante la demostración. |
@@ -43,7 +43,7 @@ El historial de septiembre de 2026 es **SIMULADO**. Los valores de demostración
 | 2. Objetivo | Atender una mayor proporción de las unidades solicitadas por los clientes en el momento de la compra. |
 | 3. Fórmula | [Σ (cantidad solicitada − cantidad entregada en la atención inicial) / Σ cantidad solicitada] × 100. Las sumas usan la misma población de solicitudes del período. |
 | 4. Unidad | Porcentaje (% de unidades solicitadas). |
-| 5. Fuente | `solicitudes_clientes`: `cantidad_solicitada`, `cantidad_entregada`, `fecha_hora`, `solicitud_previa_id` y `origen_ref`. Vista prevista: `vw_kpi_demanda`. |
+| 5. Fuente | `solicitudes_clientes`: `cantidad_solicitada`, `cantidad_entregada`, `fecha_hora`, `solicitud_previa_id` y `origen_ref`. Vista de referencia: `vw_kpi_demanda`. |
 | 6. Frecuencia | Mensual, según la fecha de la atención inicial. |
 | 7. Meta | Reducir un 20 % relativo frente a la primera línea base real validada. Meta provisional; valor inicial real pendiente de medición. |
 | 8. Responsable | Propietarios, con registro a cargo del personal de atención. El rol 3 verifica las cifras de la demostración. |
@@ -60,7 +60,7 @@ El historial de septiembre de 2026 es **SIMULADO**. Los valores de demostración
 | 2. Objetivo | Identificar mercancía con poco movimiento para revisar las decisiones de abastecimiento. |
 | 3. Fórmula | (Referencias con saldo > 0, entre 0 y 2 unidades vendidas y 30 días completos de registros / referencias monitoreadas con conteo verificado y 30 días completos de registros) × 100. |
 | 4. Unidad | Porcentaje (%). |
-| 5. Fuente | `productos`, `conteos_fisicos` y ventas de `movimientos` en la ventana de análisis. Vista prevista: `vw_kpi_rotacion`. |
+| 5. Fuente | `productos`, `conteos_fisicos` y ventas de `movimientos` en la ventana de análisis. Vista de referencia: `vw_kpi_rotacion`. |
 | 6. Frecuencia | Mensual, con ventana de 30 días completos y corte explícito. |
 | 7. Meta | Reducir un 10 % relativo frente a la primera línea base real validada. Meta provisional; el criterio de 0 a 2 unidades debe validarse por familia de productos. |
 | 8. Responsable | Propietarios. El rol 3 documenta y verifica el cálculo de demostración. |
@@ -73,18 +73,20 @@ El historial de septiembre de 2026 es **SIMULADO**. Los valores de demostración
 
 | Campo | Definición |
 | --- | --- |
-| 1. Nombre | Tiempo de confirmación del proveedor, según el hito de respuesta definido en el plan. |
+| 1. Nombre | Tiempo de confirmación del proveedor. |
 | 2. Objetivo | Medir la espera entre enviar una solicitud y registrar la respuesta del proveedor, para dar seguimiento al proceso. |
 | 3. Fórmula | Promedio de [(fecha_respuesta − fecha_envio) expresado en horas], para los pedidos incluidos en el período con ambas fechas válidas. |
 | 4. Unidad | Horas por pedido con respuesta registrada. |
-| 5. Fuente | `pedidos`: `fecha_envio` y `fecha_respuesta`; `proveedores` para identificar el proveedor. Vista prevista: `vw_kpi_respuesta`. |
-| 6. Frecuencia | Mensual. Debe quedar documentado el criterio de inclusión temporal que implemente la vista. |
+| 5. Fuente | `pedidos`: `fecha_envio` y `fecha_respuesta`; `proveedores` para identificar el proveedor. Vista de referencia: `vw_kpi_respuesta`; exportación: `pedidos.csv` y `kpi_resumen.csv`. |
+| 6. Frecuencia | Mensual, con período y corte explícitos. La demostración corresponde al 1 al 30 de septiembre de 2026. |
 | 7. Meta | Pendiente de establecer después de obtener una línea base real. No hay un valor objetivo confirmado. |
 | 8. Responsable | Propietarios, con registro de envío y respuesta a cargo de quien gestione el pedido. |
 | 9. Interpretación | Un tiempo menor indica una respuesta más rápida en los casos observados. No equivale al plazo de entrega de mercancía de 2 a 5 días. Debe mostrarse junto con el número de pedidos pendientes de respuesta. |
-| 10. Calidad del dato | Excluir del promedio los pedidos sin ambas fechas y contarlos aparte. Exigir respuesta ≥ envío y zonas horarias coherentes. Mostrar el número de observaciones. Antes de cerrar la vista, validar con el líder si «respuesta» incluye rechazos o solo confirmaciones, y qué fecha determina el mes de inclusión. |
+| 10. Calidad del dato | Excluir del promedio los pedidos sin ambas fechas y contarlos aparte. Exigir respuesta ≥ envío y zonas horarias coherentes. Mostrar el número de observaciones. Verificar que el criterio de respuesta y el filtro del período coincidan con la vista exportada. Separar los pedidos actualmente pendientes de los cancelados que tampoco tuvieron respuesta. |
 
-**Resultado de referencia:** pendiente de contar con los pedidos simulados y sus fechas. No se asigna un valor ficticio.
+**Resultado simulado verificado:** los tres pedidos con respuesta registran 3, 6 y 5 horas. El promedio es (3 + 6 + 5) / 3 = 4,6667 horas, presentado como **4,7 h**. Excel y `kpi_resumen.csv` coinciden a un decimal.
+
+Hay dos intentos con fecha de envío y sin fecha de respuesta: el pedido 2 está **CANCELADO** y el pedido 5 está **ENVIADO**. Los dos se excluyen del promedio; únicamente el segundo sigue pendiente de respuesta. No presentar ambos como pedidos actualmente pendientes.
 
 ## KPI 5. Porcentaje de pedidos confirmados con el primer proveedor
 
@@ -94,26 +96,42 @@ El historial de septiembre de 2026 es **SIMULADO**. Los valores de demostración
 | 2. Objetivo | Conocer qué proporción de las necesidades de abastecimiento confirmadas se resuelve sin acudir a un proveedor alternativo. |
 | 3. Fórmula | (Cadenas de pedidos confirmadas en el intento 1 / cadenas de pedidos confirmadas en el período) × 100. Cada cadena se cuenta una sola vez. |
 | 4. Unidad | Porcentaje (% de cadenas confirmadas). |
-| 5. Fuente | `pedidos`: `estado`, `numero_intento`, `pedido_anterior_id` y fechas de la gestión. Vista prevista: `vw_kpi_primer_proveedor`. |
+| 5. Fuente | `pedidos`: `estado`, `numero_intento`, `pedido_anterior_id` y fechas de la gestión. Vista de referencia: `vw_kpi_primer_proveedor`; el CSV incluye `cadena_id` y `confirmado_primer_proveedor` para el cotejo. |
 | 6. Frecuencia | Mensual, con período de confirmación explícito y consistente en numerador y denominador. |
 | 7. Meta | Pendiente de establecer después de obtener una línea base real. No hay un valor objetivo confirmado. |
 | 8. Responsable | Propietarios, con registro a cargo de quien gestione y confirme el pedido. |
 | 9. Interpretación | Un valor mayor indica que más cadenas confirmadas se resolvieron en el primer intento. Mide el proceso de abastecimiento y no constituye una puntuación ni una clasificación de proveedores. |
 | 10. Calidad del dato | Reconstruir cada cadena mediante `pedido_anterior_id` y verificar la secuencia de intentos. No contar intentos como pedidos independientes. Una cadena confirmada tras un reintento entra solo en el denominador. Un pedido cancelado sin confirmación no entra. Los pedidos pendientes se presentan aparte. |
 
-**Resultado de referencia:** pendiente de contar con los pedidos simulados y sus cadenas de reintentos. No se asigna un valor ficticio.
+**Resultado simulado verificado:** existen tres cadenas confirmadas; dos se resolvieron en el intento 1 y una en el intento 2. Resultado: 2 / 3 × 100 = 66,6667 %, presentado como **66,7 %**. Excel y `kpi_resumen.csv` coinciden a un decimal. El pedido cancelado y el que sigue enviado no aumentan el denominador de confirmados.
 
 ## Comprobación y evidencias del rol 3
 
-| Comprobación | Resultado esperado con la demostración | Evidencia prevista |
-| --- | --- | --- |
-| KPI 1 | 3 de 11; 27,3 %. | `analytics/consultas/verificacion_kpi.xlsx`. |
-| KPI 2 | 12 de 139; 8,6 %. | Mismo Excel y posterior comparación con el CSV. |
-| KPI 3 | 5 de 10; 50,0 %; laca transparente excluida. | Mismo Excel y posterior comparación con el CSV. |
-| KPI 4 | Por calcular cuando existan pedidos con fechas. | Vista SQL, CSV y página de Power BI. |
-| KPI 5 | Por calcular cuando existan pedidos con reintentos. | Vista SQL, CSV y página de Power BI. |
+| Indicador | Base de cálculo | Excel guardado | CSV | Cotejo a un decimal |
+| --- | --- | --- | --- | --- |
+| KPI 1 | 3 / 11 × 100 | 27,3 % | 27,3 % | Coincide. |
+| KPI 2 | 12 / 139 × 100 | 8,6 % | 8,6 % | Coincide. |
+| KPI 3 | 5 / 10 × 100; laca transparente excluida | 50,0 % | 50,0 % | Coincide. |
+| KPI 4 | 14 horas / 3 respuestas | 4,7 h | 4,7 h | Coincide. |
+| KPI 5 | 2 / 3 × 100 | 66,7 % | 66,7 % | Coincide. |
+
+El cotejo utiliza los valores guardados en `analytics/consultas/verificacion_kpi.xlsx`, hoja `Datos_simulados.`, celdas D16:D20, frente a `analytics/datos_demo/kpi_resumen.csv`. Los cálculos del Excel conservan su precisión; la comparación se hace con la presentación a un decimal del CSV. El registro detallado está preparado para `analytics/consultas/comparacion_kpi_excel_csv.md`.
+
+Las cinco tarjetas se han comprobado visualmente en el informe del rol 3. Quedan pendientes completar las páginas de Power BI, guardar las capturas en `docs/evidencias/` y documentar el flujo de una operación de demostración hasta su exportación y actualización en Power BI.
 
 La reposición sugerida de **54 unidades** es una comprobación adicional del ejemplo, no un sexto KPI. Se obtiene con una cobertura de 14 días, usando `máx(0, techo((vendidas + no atendidas) / 30 × 14 − saldo))` para las referencias con datos suficientes. La cantidad manual de la laca transparente no forma parte de ese total.
+
+## Distribución de las cinco páginas de Power BI
+
+Se conserva la estructura temática de la sección 6 del plan, confirmada por el equipo el 8 de noviembre. Todas las páginas muestran **DATOS SIMULADOS** y el corte de los archivos importados.
+
+| Página | Contenido e indicadores | CSV de referencia |
+| --- | --- | --- |
+| Resumen | Las cinco tarjetas, período y bases de cálculo. | `kpi_resumen.csv`. |
+| Disponibilidad | Existencias, agotados, críticos y KPI 1. | `inventario_actual.csv` y `kpi_resumen.csv`. |
+| Demanda | Unidades solicitadas, vendidas y no atendidas; tendencia y KPI 2. | `ventas_diarias.csv`, `solicitudes.csv` y `kpi_resumen.csv`. |
+| Baja rotación | Referencias con bajo movimiento, datos insuficientes y KPI 3. | `inventario_actual.csv` y `kpi_resumen.csv`. |
+| Pedidos y proveedores | Estados, respuestas, reintentos y KPI 4 y KPI 5. | `pedidos.csv` y `kpi_resumen.csv`. |
 
 ## Fuentes del proyecto
 
@@ -121,3 +139,5 @@ La reposición sugerida de **54 unidades** es una comprobación adicional del ej
 2. Paquete del equipo: `07_por_integrante/3_Windows_datos_PowerBI/README.md`, tabla de datos simulados y tareas del rol 3.
 3. *Demanda360. Entregable 1. Diagnóstico y proceso*, 13 de octubre de 2026, páginas 6 y 7: definición de los tres primeros KPI.
 4. Repositorio local: `database/sql/01_schema.sql`, consultado el 8 de noviembre de 2026 para verificar los nombres de tablas y campos. La presencia del esquema no acredita ejecución ni valida por sí sola las vistas de KPI.
+5. Sebastián. *Demanda360 · Estado del proyecto*, corte del 8 de noviembre de 2026 a las 16:30, apartados 3 y 4; y aclaración posterior del equipo sobre las cinco páginas temáticas.
+6. Exportaciones simuladas `analytics/datos_demo/` y valores guardados de `analytics/consultas/verificacion_kpi.xlsx`, cotejados el 8 de noviembre de 2026.
