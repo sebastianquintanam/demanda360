@@ -43,10 +43,17 @@ Comprobación rápida: `curl http://127.0.0.1:8000/api/health` → `{"estado":"o
 
 **Recargar la base desde cero** (los scripts de `database/sql/` solo corren cuando el volumen está vacío):
 
+Borra **solo** el volumen de la base y conserva n8n (flujo y credenciales). Haz `scripts/backup.sh` antes si los datos importan:
+
 ```bash
-docker compose down -v      # ⚠️ BORRA la base y n8n de tu equipo. Haz respaldo antes si importa.
+docker compose down
+docker volume rm demanda360_pgdata
 docker compose up -d --build
+docker compose exec web flask crear-usuarios-demo
+docker compose exec web flask cargar-demo
 ```
+
+`docker compose down -v` borra también el volumen de n8n: tendrías que importar el flujo y crear las credenciales otra vez.
 
 ## Desarrollo en el Mac (Flask fuera de Docker, más rápido para iterar)
 
@@ -59,6 +66,60 @@ cd backend
 flask --app run crear-usuarios-demo
 flask --app run run --debug --port 8000       # recarga al guardar
 ```
+
+## Datos demo y KPI
+
+Todo el historial es **SIMULADO**: 30 días de septiembre de 2026 con las 11 referencias del Figma (127 vendidas, 12 no atendidas, 5 pedidos). Con esos datos los KPI dan 27,3 %, 8,6 % y 50 %, y el sugerido total es 54; `backend/tests/test_kpi_demo.py` lo exige.
+
+```bash
+# En una base sin productos y con los usuarios demo ya creados:
+docker compose exec web flask cargar-demo        # aplica 02_vistas.sql, carga 10_demo.sql y muestra los KPI
+
+# Si cambia 02_vistas.sql (no borra datos):
+docker compose exec web flask aplicar-vistas
+
+# CSV para Power BI (quedan en analytics/datos_demo/):
+./analytics/exportar_csv.sh
+```
+
+- **Fecha de corte:** los KPI se calculan sobre el 1–30 de septiembre (`fn_corte()` = 2026-09-30). El saldo en pantalla es el de hoy, así que una venta en vivo cambia el saldo y el estado sin mover los KPI de septiembre. Otro corte: `CORTE=2026-10-31 ./analytics/exportar_csv.sh`.
+- **Los datos demo no se editan a mano:** se cambia `database/seeds/generar_demo.py` y se regenera `10_demo.sql` con `python3 database/seeds/generar_demo.py`.
+- **Volver a cargar desde cero** exige base vacía: ver «Recargar la base desde cero» arriba (borra solo `demanda360_pgdata`, no n8n).
+
+## Pantallas
+
+| Pantalla | Plantilla (Flask) | Prototipo (mocks, Live Server) | Lógica compartida |
+| --- | --- | --- | --- |
+| Dashboard | `frontend/templates/dashboard.html` | `frontend/prototipo/dashboard.html` | `static/js/dashboard.js` |
+| Registro | `frontend/templates/registro.html` | `frontend/prototipo/registro.html` | `static/js/registro.js` |
+| Planificación | `frontend/templates/planificacion.html` | `frontend/prototipo/planificacion.html` | `static/js/planificacion.js` |
+
+Los prototipos y las plantillas cargan los mismos `static/js/comun.js` y `static/js/<pantalla>.js`. En el prototipo, «Ver como» cambia el rol.
+
+## Alertas a n8n
+
+La venta que cruza el umbral crea la alerta y Flask la envía a n8n después de guardar la venta. Contrato completo: `docs/api/contrato.md`.
+
+```bash
+docker compose exec web flask reintentar-alertas   # reenvía las FALLIDAS (máximo 3 intentos, mismo evento_id)
+```
+
+Evidencia de la sección 5 del plan: con n8n apagado (`docker compose stop n8n`), una venta que cruza el umbral queda guardada y su alerta `FALLIDA`. Se enciende n8n (`docker compose start n8n`), se corre el reintento y pasa a `ENVIADA`.
+
+## Respaldo y restauración
+
+Con `docker compose up -d` corriendo, desde la carpeta del repositorio y **sin `sudo`** (con `sudo` el respaldo queda en la carpeta de root):
+
+```bash
+scripts/backup.sh
+scripts/restore_prueba.sh
+```
+
+- `backup.sh` corre `pg_dump` dentro del contenedor `db`, solo lee la base principal y guarda `demanda360_AAAAMMDD_HHMMSS.dump` y su huella `.sha256` en `~/demanda360_respaldos/`, **fuera del repositorio** (con permisos 600). Para otra carpeta: `BACKUP_DIR=/ruta scripts/backup.sh`.
+- `restore_prueba.sh` toma el respaldo más reciente (o el que le pases como argumento), verifica la huella, lo restaura en la base aparte `demanda360_restore` y la compara con la principal: filas de cada tabla, saldo de cada referencia y los 5 KPI. Mide la duración e imprime una fila lista para `docs/seguridad/registro_respaldos.md`. Termina con código 0 solo si todo coincide.
+- La base principal nunca se modifica. `demanda360_restore` se borra y se crea de nuevo en cada corrida.
+- Corre los dos seguidos. Si alguien usa la app entre el respaldo y la restauración, la comparación muestra la diferencia, y eso es correcto: el respaldo es una foto.
+- RPO de 1 hora (objetivo): `0 * * * * cd /ruta/a/demanda360 && scripts/backup.sh >> ~/demanda360_respaldos/backup.log 2>&1` en `crontab -e`. En la demo el respaldo se corre a mano.
 
 ## Pruebas
 

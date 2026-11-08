@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="es">
+<!--
+  PROTOTIPO (Rol 4) · Registro
+  Se abre con Live Server tomando la carpeta frontend/ como raíz y usa los mocks de static/mock/.
+  La LÓGICA no vive aquí: es static/js/comun.js + static/js/registro.js, los mismos archivos que usa
+  Flask en frontend/templates/registro.html. Un cambio de comportamiento se hace allí una sola vez.
+  Este archivo solo conserva el marco del prototipo (menú, «Ver como», aviso de mocks).
+-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Registro · Pinturas By-plus</title>
+  <link rel="stylesheet" href="../static/css/estilos.css">
+  <style>
+  .formularios { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; align-items: start; }
+  .fila-campos { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+  .acciones { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+  .opcion { display: flex; align-items: center; gap: 8px; margin: 12px 0 4px; color: var(--color-texto); }
+  .opcion input { width: auto; margin: 0; }
+  .saldo-producto { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+  .campo-error { border-color: var(--agotado-texto) !important; }
+  .msg-campo { color: var(--agotado-texto); font-size: 12px; margin-top: 4px; }
+  .resultado { margin-top: 16px; padding: 12px; border-radius: 8px; background: var(--normal-fondo); }
+  .resultado dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; margin: 8px 0 0; }
+  .resultado dt { color: var(--color-texto-suave); }
+  .resultado .subtitulo { margin-top: 12px; font-weight: 600; }
+  .resultado dd { margin: 0; }
+  .ref { font-family: monospace; font-size: 11px; word-break: break-all; }
+  @media (max-width: 760px) { .layout { flex-direction: column; } .sidebar { width: auto; } .contenido { padding: 16px; } }
+</style>
+  <style>.aviso-mock { background: var(--simulado-fondo); color: var(--simulado-texto); }</style>
+</head>
+<!-- data-rol lo pone base.html en Flask. En el prototipo "" = vista de trabajador. -->
+<body data-rol="">
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="marca">
+        <div class="marca-icono" aria-hidden="true">◫</div>
+        <div>
+          <div class="marca-nombre">Demanda360</div>
+          <div class="marca-sub">Pinturas By-plus</div>
+        </div>
+      </div>
+      <nav class="menu">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="registro.html" class="activo">Registro</a>
+        <a href="planificacion.html">Planificación de pedidos</a>
+      </nav>
+      <div class="sidebar-pie">
+        <div class="usuario">Prototipo (sin sesión)</div>
+        <label for="ver-como" style="color:#cbd5e1">Ver como (solo prototipo)</label>
+        <select id="ver-como">
+          <option value="">Trabajador</option>
+          <option value="propietario">Propietario</option>
+        </select>
+      </div>
+    </aside>
+
+    <main class="contenido">
+      <header class="encabezado">
+        <div>
+          <h1>Registro</h1>
+          <p class="subtitulo" id="subtitulo">Atenciones a clientes, conteos físicos y movimientos de inventario</p>
+        </div>
+        <span class="etiqueta etiqueta-simulado" id="etiqueta-simulado" hidden>Datos simulados</span>
+      </header>
+
+      <div class="alerta aviso-mock" id="aviso-mock" hidden>
+        <strong>Modo prototipo: las respuestas son simuladas.</strong>
+        Los botones devuelven siempre el mismo ejemplo de <code>static/mock/</code> y nada se guarda.
+        Los errores 400, 403 y 409 solo aparecen con el backend real.
+      </div>
+
+<div class="alerta alerta-error" id="error-productos" role="alert" hidden></div>
+
+<div class="formularios">
+  <!-- 1. Atención al cliente → POST /api/ventas -->
+  <section class="tarjeta">
+    <h2>Atención al cliente</h2>
+    <p class="nota">Registra lo que el cliente pidió y lo que se le entregó. La diferencia queda como demanda no atendida.</p>
+    <form id="form-venta" novalidate>
+      <label for="venta-producto">Producto</label>
+      <select id="venta-producto" name="producto_id" class="selector-producto" required></select>
+      <div class="saldo-producto" data-saldo-de="venta-producto"></div>
+
+      <div class="fila-campos">
+        <div>
+          <label for="venta-solicitada">Cantidad solicitada</label>
+          <input id="venta-solicitada" name="cantidad_solicitada" type="number" min="1" step="1" inputmode="numeric" required>
+        </div>
+        <div>
+          <label for="venta-entregada">Cantidad entregada</label>
+          <input id="venta-entregada" name="cantidad_entregada" type="number" min="0" step="1" inputmode="numeric" required>
+        </div>
+      </div>
+
+      <label class="opcion">
+        <input type="checkbox" id="venta-regreso">
+        El cliente regresa por lo que faltó en una atención anterior
+      </label>
+      <div id="bloque-regreso" hidden>
+        <label for="venta-previa">Atención original</label>
+        <select id="venta-previa" name="solicitud_previa_id"></select>
+        <p class="nota" id="venta-previa-nota"></p>
+      </div>
+
+      <div class="alerta alerta-error" data-error role="alert" hidden></div>
+      <div class="acciones">
+        <button type="reset" class="boton">Limpiar</button>
+        <button type="submit" class="boton boton-primario">Registrar atención</button>
+      </div>
+      <p class="nota">Referencia del formulario (evita duplicados): <span class="ref" data-ref></span></p>
+    </form>
+    <div data-resultado></div>
+  </section>
+
+  <!-- 2. Conteo físico → POST /api/conteos -->
+  <section class="tarjeta">
+    <h2>Conteo físico</h2>
+    <p class="nota">Unidades contadas en la tienda. El conteo es una foto: reemplaza el saldo, no se suma.</p>
+    <form id="form-conteo" novalidate>
+      <label for="conteo-producto">Producto</label>
+      <select id="conteo-producto" name="producto_id" class="selector-producto" required></select>
+      <div class="saldo-producto" data-saldo-de="conteo-producto"></div>
+
+      <label for="conteo-cantidad">Cantidad contada</label>
+      <input id="conteo-cantidad" name="cantidad_contada" type="number" min="0" step="1" inputmode="numeric" required>
+
+      <label for="conteo-observaciones">Observaciones (opcional)</label>
+      <textarea id="conteo-observaciones" name="observaciones" rows="2" maxlength="300"></textarea>
+
+      <div class="alerta alerta-error" data-error role="alert" hidden></div>
+      <div class="acciones">
+        <button type="reset" class="boton">Limpiar</button>
+        <button type="submit" class="boton boton-primario">Registrar conteo</button>
+      </div>
+      <p class="nota">Referencia del formulario (evita duplicados): <span class="ref" data-ref></span></p>
+    </form>
+    <div data-resultado></div>
+  </section>
+
+  <!-- 3. Entrada o ajuste → POST /api/movimientos -->
+  <section class="tarjeta">
+    <h2>Entrada o ajuste</h2>
+    <p class="nota">Entrada: mercancía que llegó. Ajuste (solo propietario): corrección con justificación.</p>
+    <form id="form-movimiento" novalidate>
+      <label for="mov-producto">Producto</label>
+      <select id="mov-producto" name="producto_id" class="selector-producto" required></select>
+      <div class="saldo-producto" data-saldo-de="mov-producto"></div>
+
+      <label>Tipo de movimiento</label>
+      <label class="opcion"><input type="radio" name="tipo" value="ENTRADA" checked> Entrada de mercancía</label>
+      <label class="opcion solo-propietario"><input type="radio" name="tipo" value="AJUSTE"> Ajuste de inventario</label>
+
+      <label for="mov-cantidad" id="mov-cantidad-label">Cantidad recibida</label>
+      <input id="mov-cantidad" name="cantidad" type="number" step="1" inputmode="numeric" required>
+      <p class="nota" id="mov-cantidad-ayuda" data-ayuda="cantidad">Entero mayor que 0.</p>
+
+      <div id="bloque-justificacion" class="solo-propietario" hidden>
+        <label for="mov-justificacion">Justificación del ajuste</label>
+        <textarea id="mov-justificacion" name="justificacion" rows="3" maxlength="500"></textarea>
+      </div>
+
+      <div class="alerta alerta-error" data-error role="alert" hidden></div>
+      <div class="acciones">
+        <button type="reset" class="boton">Limpiar</button>
+        <button type="submit" class="boton boton-primario">Registrar movimiento</button>
+      </div>
+      <p class="nota">Referencia del formulario (evita duplicados): <span class="ref" data-ref></span></p>
+    </form>
+    <div data-resultado></div>
+  </section>
+</div>
+
+
+<!-- 4. Crear producto → POST /api/productos (solo propietario; el backend responde 403 al trabajador) -->
+<section class="tarjeta solo-propietario">
+  <h2>Crear producto</h2>
+  <form id="form-producto" novalidate>
+    <div class="fila-campos">
+      <div><label for="p-sku">SKU</label><input id="p-sku" name="sku" maxlength="30" autocomplete="off"></div>
+      <div><label for="p-nombre">Nombre</label><input id="p-nombre" name="nombre" maxlength="150"></div>
+      <div><label for="p-categoria">Categoría</label><select id="p-categoria" name="categoria_id"></select></div>
+      <div><label for="p-proveedor">Proveedor habitual</label><select id="p-proveedor" name="proveedor_id"></select></div>
+      <div><label for="p-marca">Marca (opcional)</label><input id="p-marca" name="marca" maxlength="80"></div>
+      <div><label for="p-presentacion">Presentación</label><input id="p-presentacion" name="presentacion" maxlength="60" placeholder="Galón"></div>
+      <div><label for="p-unidad">Unidad de medida</label><select id="p-unidad" name="unidad_medida"></select></div>
+      <div><label for="p-umbral">Umbral de reposición</label><input id="p-umbral" name="umbral_reposicion" type="number" min="0" step="1" inputmode="numeric"></div>
+      <div><label for="p-costo">Costo de compra</label><input id="p-costo" name="costo_compra" inputmode="decimal" placeholder="85000"></div>
+      <div><label for="p-precio">Precio de venta</label><input id="p-precio" name="precio_venta" inputmode="decimal" placeholder="110000"></div>
+    </div>
+    <div class="alerta alerta-error" data-error role="alert" hidden></div>
+    <div class="acciones">
+      <button type="reset" class="boton">Limpiar</button>
+      <button type="submit" class="boton boton-primario">Guardar producto</button>
+    </div>
+  </form>
+  <div data-resultado></div>
+</section>
+
+    </main>
+  </div>
+
+  <script>window.USE_MOCK = true;</script>
+  <script src="../static/js/api.js"></script>
+  <script src="../static/js/comun.js"></script>
+  <script>
+    // «Ver como»: cambia el rol del prototipo y recarga la pantalla con ese rol
+    const verComo = document.getElementById("ver-como");
+    verComo.value = sessionStorage.getItem("prototipo-rol") || "";
+    document.body.dataset.rol = verComo.value;
+    verComo.addEventListener("change", () => { sessionStorage.setItem("prototipo-rol", verComo.value); location.reload(); });
+  </script>
+  <script src="../static/js/registro.js"></script>
+</body>
+</html>

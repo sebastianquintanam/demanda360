@@ -1,0 +1,6 @@
+﻿pedido_id,cadena_id,numero_intento,pedido_anterior_id,proveedor,plazo_entrega_dias,estado,fecha_creacion,fecha_aprobacion,fecha_envio,fecha_respuesta,fecha_entrega_estimada,horas_respuesta,horas_esperando_al_corte,confirmado_primer_proveedor,motivo_cancelacion,referencias,unidades_solicitadas,unidades_sugeridas,skus,corte,origen_datos
+1,1,1,,Suministros Andinos (ficticio),3,CONFIRMADO,2026-09-04 09:00:00,2026-09-04 09:15:00,2026-09-04 09:30:00,2026-09-04 12:30:00,2026-09-07,3.0,,SI,,1,25,25,LAC-BP-01,2026-09-30,SIMULADO
+2,2,1,,Distribuidora Cordillera (ficticio),4,CANCELADO,2026-09-09 10:00:00,2026-09-09 10:10:00,2026-09-09 10:20:00,,,,,NO,Sin respuesta del proveedor en 48 horas; se pide a otro proveedor,1,10,10,LAC-BP-02,2026-09-30,SIMULADO
+3,2,2,2,Suministros Andinos (ficticio),3,CONFIRMADO,2026-09-11 10:30:00,2026-09-11 10:40:00,2026-09-11 10:45:00,2026-09-11 16:45:00,2026-09-14,6.0,,NO,,1,10,10,LAC-BP-02,2026-09-30,SIMULADO
+4,4,1,,Químicos La Sabana (ficticio),5,CONFIRMADO,2026-09-14 09:00:00,2026-09-14 09:20:00,2026-09-14 09:30:00,2026-09-14 14:30:00,2026-09-19,5.0,,SI,,1,13,13,SEL-AQ-01,2026-09-30,SIMULADO
+5,5,1,,Suministros Andinos (ficticio),3,ENVIADO,2026-09-28 09:00:00,2026-09-28 09:10:00,2026-09-28 09:20:00,,,,62.7,NO,,1,13,13,ESM-WH-01,2026-09-30,SIMULADO

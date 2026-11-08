@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Def_Demanda360_TOBE" targetNamespace="http://bpmn.io/schema/bpmn" exporter="bpmn-js (https://demo.bpmn.io)" exporterVersion="17.0.0">
+<bpmn:documentation>TO-BE propuesto de Demanda360 (v3, 8 nov 2026). Proceso principal: planificación y generación de pedidos hasta Pedido confirmado. Procesos operativos relacionados: atención y alerta de stock crítico (P0) y entrada de mercancía (P0). [P0] en desarrollo, [P1] planeado, [Manual] fuera del sistema. Espera del proveedor según AS-IS v3 (30 minutos; límite de una hora desde el primer contacto con cada proveedor).</bpmn:documentation>
+<bpmn:category id="Cat_CV_Entrada"><bpmn:categoryValue id="CV_Entrada" value="Proceso relacionado: entrada de mercancía (P0)" /></bpmn:category><bpmn:category id="Cat_CV_Atencion"><bpmn:categoryValue id="CV_Atencion" value="Proceso operativo: atención al cliente y alerta de stock crítico (P0)" /></bpmn:category>
+<bpmn:collaboration id="Colab_TOBE">
+<bpmn:participant id="Proveedor" name="Proveedor" />
+<bpmn:participant id="Part_ByPlus" name="Pinturas By-plus con Demanda360 (TO-BE propuesto)" processRef="Proc_TOBE" />
+<bpmn:messageFlow id="M_Solicitud" name="Solicitud de pedido" sourceRef="T_Enviar" targetRef="Proveedor" /><bpmn:messageFlow id="M_Conf" name="Confirmación y fecha estimada" sourceRef="Proveedor" targetRef="EV_Conf" /><bpmn:messageFlow id="M_Falta" name="Aviso de falta de disponibilidad" sourceRef="Proveedor" targetRef="EV_Falta" /><bpmn:messageFlow id="M_Entrega" name="Entrega de mercancía" sourceRef="Proveedor" targetRef="Inicio_Entrada" />
+</bpmn:collaboration>
+<bpmn:process id="Proc_TOBE" name="Planificación y generación de pedidos (TO-BE)" isExecutable="false">
+<bpmn:laneSet id="LaneSet_TOBE"><bpmn:lane id="L_Prop" name="Propietario"><bpmn:flowNodeRef>Inicio</bpmn:flowNodeRef><bpmn:flowNodeRef>T_Tablero</bpmn:flowNodeRef><bpmn:flowNodeRef>GW_Conteo</bpmn:flowNodeRef><bpmn:flowNodeRef>T_Conteo</bpmn:flowNodeRef><bpmn:flowNodeRef>GW_UneConteo</bpmn:flowNodeRef><bpmn:flowNodeRef>T_Determinar</bpmn:flowNodeRef><bpmn:flowNodeRef>GW_Pedido</bpmn:flowNodeRef><bpmn:flowNodeRef>Fin_SinPedido</bpmn:flowNodeRef><bpmn:flowNodeRef>T_Borrador</bpmn:flowNodeRef><bpmn:flowNodeRef>T_Aprobar</bpmn:flowNodeRef><bpmn:flowNodeRef>GW_Reenvio</bpmn:flowNodeRef><bpmn:flowNodeRef>T_Enviar</bpmn:flowNodeRef><bpmn:flowNodeRef>GW_Amplia</bpmn:flowNodeRef><bpmn:flowNodeRef>GW_Espera</bpmn:flowNodeRef><bpmn:flowNodeRef>EV_Conf</bpmn:flowNodeRef><bpmn:flowNodeRef>T_RegConf</bpmn:flowNodeRef><bpmn:flowNodeRef>Fin_Conf</bpmn:flowNodeRef><bpmn:flowNodeRef>EV_Falta</bpmn:flowNodeRef><bpmn:flowNodeRef>EV_Timer</bpmn:flowNodeRef><bpmn:flowNodeRef>GW_Hora</bpmn:flowNodeRef><bpmn:flowNodeRef>GW_UneCambio</bpmn:flowNodeRef><bpmn:flowNodeRef>T_Cancelar</bpmn:flowNodeRef><bpmn:flowNodeRef>GW_Otro</bpmn:flowNodeRef><bpmn:flowNodeRef>Fin_SinProveedor</bpmn:flowNodeRef><bpmn:flowNodeRef>T_Alt</bpmn:flowNodeRef><bpmn:flowNodeRef>T_Actualizar</bpmn:flowNodeRef></bpmn:lane><bpmn:lane id="L_Trab" name="Trabajador"><bpmn:flowNodeRef>Inicio_Entrada</bpmn:flowNodeRef><bpmn:flowNodeRef>T_Entrada</bpmn:flowNodeRef><bpmn:flowNodeRef>Inicio_Atencion</bpmn:flowNodeRef><bpmn:flowNodeRef>T_Atencion</bpmn:flowNodeRef></bpmn:lane><bpmn:lane id="L_App" name="Demanda360: aplicación (Flask y PostgreSQL)"><bpmn:flowNodeRef>T_GuardarEntrada</bpmn:flowNodeRef><bpmn:flowNodeRef>Fin_Entrada</bpmn:flowNodeRef><bpmn:flowNodeRef>T_Sugeridos</bpmn:flowNodeRef><bpmn:flowNodeRef>GW_Saldo</bpmn:flowNodeRef><bpmn:flowNodeRef>Fin_Rechazo</bpmn:flowNodeRef><bpmn:flowNodeRef>GW_Entrega</bpmn:flowNodeRef><bpmn:flowNodeRef>T_NoAtendida</bpmn:flowNodeRef><bpmn:flowNodeRef>Fin_NoAtendida</bpmn:flowNodeRef><bpmn:flowNodeRef>T_Guardar</bpmn:flowNodeRef><bpmn:flowNodeRef>GW_Umbral</bpmn:flowNodeRef><bpmn:flowNodeRef>Fin_SinAlerta</bpmn:flowNodeRef><bpmn:flowNodeRef>T_Alerta</bpmn:flowNodeRef><bpmn:flowNodeRef>GW_Envio</bpmn:flowNodeRef><bpmn:flowNodeRef>T_Enviada</bpmn:flowNodeRef><bpmn:flowNodeRef>Fin_Enviada</bpmn:flowNodeRef><bpmn:flowNodeRef>T_Fallida</bpmn:flowNodeRef><bpmn:flowNodeRef>GW_Intentos</bpmn:flowNodeRef><bpmn:flowNodeRef>Fin_Fallida</bpmn:flowNodeRef></bpmn:lane><bpmn:lane id="L_N8N" name="Demanda360: n8n"><bpmn:flowNodeRef>GW_UneRe</bpmn:flowNodeRef><bpmn:flowNodeRef>T_Correo</bpmn:flowNodeRef></bpmn:lane></bpmn:laneSet>
+<bpmn:startEvent id="Inicio_Entrada" name="Llega la mercancía"><bpmn:outgoing>E1</bpmn:outgoing><bpmn:messageEventDefinition id="MED_Entrada" /></bpmn:startEvent>
+<bpmn:task id="T_Entrada" name="Registrar la entrada de mercancía [P0]"><bpmn:incoming>E1</bpmn:incoming><bpmn:outgoing>E2</bpmn:outgoing></bpmn:task>
+<bpmn:task id="T_GuardarEntrada" name="Guardar la entrada y actualizar el saldo [P0]"><bpmn:incoming>E2</bpmn:incoming><bpmn:outgoing>E3</bpmn:outgoing></bpmn:task>
+<bpmn:endEvent id="Fin_Entrada" name="Saldo actualizado"><bpmn:incoming>E3</bpmn:incoming></bpmn:endEvent>
+<bpmn:startEvent id="Inicio" name="Necesidad de revisar el abastecimiento"><bpmn:outgoing>B1</bpmn:outgoing></bpmn:startEvent>
+<bpmn:task id="T_Tablero" name="Revisar existencias y rotación en el tablero [P0]"><bpmn:incoming>B1</bpmn:incoming><bpmn:outgoing>B2</bpmn:outgoing></bpmn:task>
+<bpmn:exclusiveGateway id="GW_Conteo" name="¿Es necesario hacer un conteo físico?"><bpmn:incoming>B2</bpmn:incoming><bpmn:outgoing>B3</bpmn:outgoing><bpmn:outgoing>B4</bpmn:outgoing></bpmn:exclusiveGateway>
+<bpmn:task id="T_Conteo" name="Hacer y registrar el conteo físico [P0]"><bpmn:incoming>B3</bpmn:incoming><bpmn:outgoing>B5</bpmn:outgoing></bpmn:task>
+<bpmn:exclusiveGateway id="GW_UneConteo"><bpmn:incoming>B4</bpmn:incoming><bpmn:incoming>B5</bpmn:incoming><bpmn:outgoing>B6</bpmn:outgoing></bpmn:exclusiveGateway>
+<bpmn:task id="T_Sugeridos" name="Calcular las cantidades sugeridas (cobertura de 14 días) [P1]"><bpmn:incoming>B6</bpmn:incoming><bpmn:outgoing>B7</bpmn:outgoing></bpmn:task>
+<bpmn:task id="T_Determinar" name="Revisar las sugerencias y decidir qué comprar"><bpmn:incoming>B7</bpmn:incoming><bpmn:outgoing>B8</bpmn:outgoing></bpmn:task>
+<bpmn:exclusiveGateway id="GW_Pedido" name="¿Es necesario hacer un pedido?"><bpmn:incoming>B8</bpmn:incoming><bpmn:outgoing>B9</bpmn:outgoing><bpmn:outgoing>B10</bpmn:outgoing></bpmn:exclusiveGateway>
+<bpmn:endEvent id="Fin_SinPedido" name="Fin sin pedido"><bpmn:incoming>B9</bpmn:incoming></bpmn:endEvent>
+<bpmn:task id="T_Borrador" name="Crear el borrador del pedido [P1]"><bpmn:incoming>B10</bpmn:incoming><bpmn:outgoing>B11</bpmn:outgoing></bpmn:task>
+<bpmn:task id="T_Aprobar" name="Aprobar el pedido [P1]"><bpmn:incoming>B11</bpmn:incoming><bpmn:outgoing>B12</bpmn:outgoing></bpmn:task>
+<bpmn:exclusiveGateway id="GW_Reenvio"><bpmn:incoming>B12</bpmn:incoming><bpmn:incoming>B28</bpmn:incoming><bpmn:outgoing>B13</bpmn:outgoing></bpmn:exclusiveGateway>
+<bpmn:task id="T_Enviar" name="Enviar el pedido por WhatsApp o llamada y marcarlo como ENVIADO [Manual / P1]"><bpmn:incoming>B13</bpmn:incoming><bpmn:outgoing>B14</bpmn:outgoing></bpmn:task>
+<bpmn:exclusiveGateway id="GW_Amplia"><bpmn:incoming>B14</bpmn:incoming><bpmn:incoming>B24</bpmn:incoming><bpmn:outgoing>B15</bpmn:outgoing></bpmn:exclusiveGateway>
+<bpmn:eventBasedGateway id="GW_Espera" name="Esperar la respuesta del proveedor [Manual]"><bpmn:incoming>B15</bpmn:incoming><bpmn:outgoing>B16</bpmn:outgoing><bpmn:outgoing>B17</bpmn:outgoing><bpmn:outgoing>B18</bpmn:outgoing></bpmn:eventBasedGateway>
+<bpmn:intermediateCatchEvent id="EV_Conf" name="Confirmación y fecha recibidas"><bpmn:incoming>B16</bpmn:incoming><bpmn:outgoing>B19</bpmn:outgoing><bpmn:messageEventDefinition id="MED_Conf" /></bpmn:intermediateCatchEvent>
+<bpmn:task id="T_RegConf" name="Registrar la confirmación y la fecha de entrega [P1]"><bpmn:incoming>B19</bpmn:incoming><bpmn:outgoing>B20</bpmn:outgoing></bpmn:task>
+<bpmn:endEvent id="Fin_Conf" name="Pedido confirmado"><bpmn:incoming>B20</bpmn:incoming></bpmn:endEvent>
+<bpmn:intermediateCatchEvent id="EV_Falta" name="Proveedor sin disponibilidad"><bpmn:incoming>B17</bpmn:incoming><bpmn:outgoing>B21</bpmn:outgoing><bpmn:messageEventDefinition id="MED_Falta" /></bpmn:intermediateCatchEvent>
+<bpmn:intermediateCatchEvent id="EV_Timer" name="Pasan 30 minutos sin respuesta"><bpmn:incoming>B18</bpmn:incoming><bpmn:outgoing>B22</bpmn:outgoing><bpmn:timerEventDefinition id="TED_30min"><bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT30M</bpmn:timeDuration></bpmn:timerEventDefinition></bpmn:intermediateCatchEvent>
+<bpmn:exclusiveGateway id="GW_Hora" name="¿Ya pasó una hora desde el primer contacto con este proveedor?"><bpmn:incoming>B22</bpmn:incoming><bpmn:outgoing>B23</bpmn:outgoing><bpmn:outgoing>B24</bpmn:outgoing></bpmn:exclusiveGateway>
+<bpmn:exclusiveGateway id="GW_UneCambio"><bpmn:incoming>B21</bpmn:incoming><bpmn:incoming>B23</bpmn:incoming><bpmn:outgoing>B25</bpmn:outgoing></bpmn:exclusiveGateway>
+<bpmn:task id="T_Cancelar" name="Registrar la cancelación y su motivo (CANCELADO) [P1]"><bpmn:incoming>B25</bpmn:incoming><bpmn:outgoing>B26</bpmn:outgoing></bpmn:task>
+<bpmn:exclusiveGateway id="GW_Otro" name="¿Hay otro proveedor disponible?"><bpmn:incoming>B26</bpmn:incoming><bpmn:outgoing>B26b</bpmn:outgoing><bpmn:outgoing>B26c</bpmn:outgoing></bpmn:exclusiveGateway>
+<bpmn:endEvent id="Fin_SinProveedor" name="Pedido cancelado, sin otro proveedor"><bpmn:incoming>B26c</bpmn:incoming></bpmn:endEvent>
+<bpmn:task id="T_Alt" name="Elegir otro proveedor [Manual]"><bpmn:incoming>B26b</bpmn:incoming><bpmn:outgoing>B27</bpmn:outgoing></bpmn:task>
+<bpmn:task id="T_Actualizar" name="Preparar el nuevo intento con ese proveedor [P1]"><bpmn:incoming>B27</bpmn:incoming><bpmn:outgoing>B28</bpmn:outgoing></bpmn:task>
+<bpmn:startEvent id="Inicio_Atencion" name="Un cliente pide productos"><bpmn:outgoing>A1</bpmn:outgoing><bpmn:messageEventDefinition id="MED_Atencion" /></bpmn:startEvent>
+<bpmn:task id="T_Atencion" name="Registrar lo que pidió el cliente y lo que recibió [P0]"><bpmn:incoming>A1</bpmn:incoming><bpmn:outgoing>A2</bpmn:outgoing></bpmn:task>
+<bpmn:exclusiveGateway id="GW_Saldo" name="¿Se entrega más de lo disponible?"><bpmn:incoming>A2</bpmn:incoming><bpmn:outgoing>A3</bpmn:outgoing><bpmn:outgoing>A3b</bpmn:outgoing></bpmn:exclusiveGateway>
+<bpmn:endEvent id="Fin_Rechazo" name="Registro rechazado por falta de saldo (409)"><bpmn:incoming>A3</bpmn:incoming></bpmn:endEvent>
+<bpmn:exclusiveGateway id="GW_Entrega" name="¿Se entregó alguna unidad?"><bpmn:incoming>A3b</bpmn:incoming><bpmn:outgoing>A4</bpmn:outgoing><bpmn:outgoing>A4b</bpmn:outgoing></bpmn:exclusiveGateway>
+<bpmn:task id="T_NoAtendida" name="Guardar la solicitud como demanda no atendida (el saldo no cambia) [P0]"><bpmn:incoming>A4b</bpmn:incoming><bpmn:outgoing>A4c</bpmn:outgoing></bpmn:task>
+<bpmn:endEvent id="Fin_NoAtendida" name="Demanda no atendida registrada"><bpmn:incoming>A4c</bpmn:incoming></bpmn:endEvent>
+<bpmn:task id="T_Guardar" name="Guardar la venta y actualizar saldo y estado [P0]"><bpmn:incoming>A4</bpmn:incoming><bpmn:outgoing>A5</bpmn:outgoing></bpmn:task>
+<bpmn:exclusiveGateway id="GW_Umbral" name="¿El saldo llegó al nivel crítico con esta venta?"><bpmn:incoming>A5</bpmn:incoming><bpmn:outgoing>A6</bpmn:outgoing><bpmn:outgoing>A7</bpmn:outgoing></bpmn:exclusiveGateway>
+<bpmn:endEvent id="Fin_SinAlerta" name="Venta registrada sin alerta"><bpmn:incoming>A6</bpmn:incoming></bpmn:endEvent>
+<bpmn:task id="T_Alerta" name="Registrar la alerta (PENDIENTE) y avisar a n8n [P0]"><bpmn:incoming>A7</bpmn:incoming><bpmn:outgoing>A8</bpmn:outgoing></bpmn:task>
+<bpmn:exclusiveGateway id="GW_UneRe"><bpmn:incoming>A8</bpmn:incoming><bpmn:incoming>A14</bpmn:incoming><bpmn:outgoing>A8b</bpmn:outgoing></bpmn:exclusiveGateway>
+<bpmn:task id="T_Correo" name="Enviar el correo de stock crítico al equipo [P0]"><bpmn:incoming>A8b</bpmn:incoming><bpmn:outgoing>A9</bpmn:outgoing></bpmn:task>
+<bpmn:exclusiveGateway id="GW_Envio" name="¿n8n confirmó el envío?"><bpmn:incoming>A9</bpmn:incoming><bpmn:outgoing>A10</bpmn:outgoing><bpmn:outgoing>A11</bpmn:outgoing></bpmn:exclusiveGateway>
+<bpmn:task id="T_Enviada" name="Marcar la alerta como ENVIADA [P0]"><bpmn:incoming>A10</bpmn:incoming><bpmn:outgoing>A12</bpmn:outgoing></bpmn:task>
+<bpmn:endEvent id="Fin_Enviada" name="Alerta enviada"><bpmn:incoming>A12</bpmn:incoming></bpmn:endEvent>
+<bpmn:task id="T_Fallida" name="Marcar la alerta como FALLIDA y sumar un intento [P0]"><bpmn:incoming>A11</bpmn:incoming><bpmn:outgoing>A13</bpmn:outgoing></bpmn:task>
+<bpmn:exclusiveGateway id="GW_Intentos" name="¿Lleva menos de 3 intentos?"><bpmn:incoming>A13</bpmn:incoming><bpmn:outgoing>A14</bpmn:outgoing><bpmn:outgoing>A15</bpmn:outgoing></bpmn:exclusiveGateway>
+<bpmn:endEvent id="Fin_Fallida" name="Alerta no enviada; la venta sigue guardada"><bpmn:incoming>A15</bpmn:incoming></bpmn:endEvent>
+<bpmn:sequenceFlow id="E1" sourceRef="Inicio_Entrada" targetRef="T_Entrada" />
+<bpmn:sequenceFlow id="E2" sourceRef="T_Entrada" targetRef="T_GuardarEntrada" />
+<bpmn:sequenceFlow id="E3" sourceRef="T_GuardarEntrada" targetRef="Fin_Entrada" />
+<bpmn:sequenceFlow id="B1" sourceRef="Inicio" targetRef="T_Tablero" />
+<bpmn:sequenceFlow id="B2" sourceRef="T_Tablero" targetRef="GW_Conteo" />
+<bpmn:sequenceFlow id="B3" name="Sí" sourceRef="GW_Conteo" targetRef="T_Conteo" />
+<bpmn:sequenceFlow id="B4" name="No" sourceRef="GW_Conteo" targetRef="GW_UneConteo" />
+<bpmn:sequenceFlow id="B5" sourceRef="T_Conteo" targetRef="GW_UneConteo" />
+<bpmn:sequenceFlow id="B6" sourceRef="GW_UneConteo" targetRef="T_Sugeridos" />
+<bpmn:sequenceFlow id="B7" sourceRef="T_Sugeridos" targetRef="T_Determinar" />
+<bpmn:sequenceFlow id="B8" sourceRef="T_Determinar" targetRef="GW_Pedido" />
+<bpmn:sequenceFlow id="B9" name="No" sourceRef="GW_Pedido" targetRef="Fin_SinPedido" />
+<bpmn:sequenceFlow id="B10" name="Sí" sourceRef="GW_Pedido" targetRef="T_Borrador" />
+<bpmn:sequenceFlow id="B11" sourceRef="T_Borrador" targetRef="T_Aprobar" />
+<bpmn:sequenceFlow id="B12" sourceRef="T_Aprobar" targetRef="GW_Reenvio" />
+<bpmn:sequenceFlow id="B13" sourceRef="GW_Reenvio" targetRef="T_Enviar" />
+<bpmn:sequenceFlow id="B14" sourceRef="T_Enviar" targetRef="GW_Amplia" />
+<bpmn:sequenceFlow id="B15" sourceRef="GW_Amplia" targetRef="GW_Espera" />
+<bpmn:sequenceFlow id="B16" sourceRef="GW_Espera" targetRef="EV_Conf" />
+<bpmn:sequenceFlow id="B17" sourceRef="GW_Espera" targetRef="EV_Falta" />
+<bpmn:sequenceFlow id="B18" sourceRef="GW_Espera" targetRef="EV_Timer" />
+<bpmn:sequenceFlow id="B19" sourceRef="EV_Conf" targetRef="T_RegConf" />
+<bpmn:sequenceFlow id="B20" sourceRef="T_RegConf" targetRef="Fin_Conf" />
+<bpmn:sequenceFlow id="B21" sourceRef="EV_Falta" targetRef="GW_UneCambio" />
+<bpmn:sequenceFlow id="B22" sourceRef="EV_Timer" targetRef="GW_Hora" />
+<bpmn:sequenceFlow id="B23" name="Sí" sourceRef="GW_Hora" targetRef="GW_UneCambio" />
+<bpmn:sequenceFlow id="B24" name="No: seguir esperando" sourceRef="GW_Hora" targetRef="GW_Amplia" />
+<bpmn:sequenceFlow id="B25" sourceRef="GW_UneCambio" targetRef="T_Cancelar" />
+<bpmn:sequenceFlow id="B26" sourceRef="T_Cancelar" targetRef="GW_Otro" />
+<bpmn:sequenceFlow id="B26b" name="Sí" sourceRef="GW_Otro" targetRef="T_Alt" />
+<bpmn:sequenceFlow id="B26c" name="No" sourceRef="GW_Otro" targetRef="Fin_SinProveedor" />
+<bpmn:sequenceFlow id="B27" sourceRef="T_Alt" targetRef="T_Actualizar" />
+<bpmn:sequenceFlow id="B28" sourceRef="T_Actualizar" targetRef="GW_Reenvio" />
+<bpmn:sequenceFlow id="A1" sourceRef="Inicio_Atencion" targetRef="T_Atencion" />
+<bpmn:sequenceFlow id="A2" sourceRef="T_Atencion" targetRef="GW_Saldo" />
+<bpmn:sequenceFlow id="A3" name="Sí" sourceRef="GW_Saldo" targetRef="Fin_Rechazo" />
+<bpmn:sequenceFlow id="A3b" name="No" sourceRef="GW_Saldo" targetRef="GW_Entrega" />
+<bpmn:sequenceFlow id="A4" name="Sí" sourceRef="GW_Entrega" targetRef="T_Guardar" />
+<bpmn:sequenceFlow id="A4b" name="No (entregado = 0)" sourceRef="GW_Entrega" targetRef="T_NoAtendida" />
+<bpmn:sequenceFlow id="A4c" sourceRef="T_NoAtendida" targetRef="Fin_NoAtendida" />
+<bpmn:sequenceFlow id="A5" sourceRef="T_Guardar" targetRef="GW_Umbral" />
+<bpmn:sequenceFlow id="A6" name="No" sourceRef="GW_Umbral" targetRef="Fin_SinAlerta" />
+<bpmn:sequenceFlow id="A7" name="Sí" sourceRef="GW_Umbral" targetRef="T_Alerta" />
+<bpmn:sequenceFlow id="A8" sourceRef="T_Alerta" targetRef="GW_UneRe" />
+<bpmn:sequenceFlow id="A8b" sourceRef="GW_UneRe" targetRef="T_Correo" />
+<bpmn:sequenceFlow id="A9" sourceRef="T_Correo" targetRef="GW_Envio" />
+<bpmn:sequenceFlow id="A10" name="Sí" sourceRef="GW_Envio" targetRef="T_Enviada" />
+<bpmn:sequenceFlow id="A11" name="No" sourceRef="GW_Envio" targetRef="T_Fallida" />
+<bpmn:sequenceFlow id="A12" sourceRef="T_Enviada" targetRef="Fin_Enviada" />
+<bpmn:sequenceFlow id="A13" sourceRef="T_Fallida" targetRef="GW_Intentos" />
+<bpmn:sequenceFlow id="A14" name="Sí: reintento posterior con el mismo evento_id" sourceRef="GW_Intentos" targetRef="GW_UneRe" />
+<bpmn:sequenceFlow id="A15" name="No" sourceRef="GW_Intentos" targetRef="Fin_Fallida" />
+<bpmn:textAnnotation id="A_Leyenda"><bpmn:text>Convenciones: [P0] obligatorio del MVP, en desarrollo y probado con datos simulados. [P1] funcionalidad prevista para una etapa posterior. [Manual] se hace fuera del sistema. Es un modelo propuesto: no indica funciones ya implementadas.</bpmn:text></bpmn:textAnnotation>
+<bpmn:textAnnotation id="A_Espera"><bpmn:text>El propietario controla la espera; el sistema solo muestra cuántas horas lleva el pedido sin respuesta.</bpmn:text></bpmn:textAnnotation>
+<bpmn:association id="AS_Espera" associationDirection="None" sourceRef="A_Espera" targetRef="GW_Espera" />
+<bpmn:textAnnotation id="A_Aprob"><bpmn:text>Pendiente con Quintana: definir si el nuevo intento necesita otra aprobación. Por ahora se reenvía sin aprobar de nuevo.</bpmn:text></bpmn:textAnnotation>
+<bpmn:association id="AS_Aprob" associationDirection="None" sourceRef="A_Aprob" targetRef="T_Actualizar" />
+<bpmn:textAnnotation id="A_Sug"><bpmn:text>Si hay menos de 30 días de datos, la cantidad se define a mano.</bpmn:text></bpmn:textAnnotation>
+<bpmn:association id="AS_Sug" associationDirection="None" sourceRef="A_Sug" targetRef="T_Sugeridos" />
+<bpmn:textAnnotation id="A_SinConteo"><bpmn:text>Pendiente con Quintana: cómo validar entregas de productos SIN_CONTEO.</bpmn:text></bpmn:textAnnotation>
+<bpmn:association id="AS_SinConteo" associationDirection="None" sourceRef="A_SinConteo" targetRef="GW_Saldo" />
+<bpmn:textAnnotation id="A_Regresa"><bpmn:text>Si el cliente vuelve por una solicitud anterior, se enlaza con ella y no se cuenta como demanda nueva.</bpmn:text></bpmn:textAnnotation>
+<bpmn:association id="AS_Regresa" associationDirection="None" sourceRef="A_Regresa" targetRef="T_Atencion" />
+<bpmn:textAnnotation id="A_Umbral"><bpmn:text>Regla del plan: la alerta sale solo cuando una venta deja el saldo en el umbral o por debajo, si antes estaba por encima, y no se repite con las ventas siguientes. El plan no define alertas por conteos, entradas ni ajustes.</bpmn:text></bpmn:textAnnotation>
+<bpmn:association id="AS_Umbral" associationDirection="None" sourceRef="A_Umbral" targetRef="GW_Umbral" />
+<bpmn:textAnnotation id="A_Reint"><bpmn:text>Los reintentos no son inmediatos: se hacen después con el comando flask reintentar-alertas, que reenvía las alertas FALLIDAS (máximo 3 intentos).</bpmn:text></bpmn:textAnnotation>
+<bpmn:association id="AS_Reint" associationDirection="None" sourceRef="A_Reint" targetRef="GW_Intentos" />
+<bpmn:group id="G_Entrada" categoryValueRef="CV_Entrada" />
+<bpmn:group id="G_Atencion" categoryValueRef="CV_Atencion" />
+</bpmn:process>
+<bpmndi:BPMNDiagram id="Diagram_TOBE"><bpmndi:BPMNPlane id="Plane_TOBE" bpmnElement="Colab_TOBE">
+<bpmndi:BPMNShape id="Proveedor_di" bpmnElement="Proveedor" isHorizontal="true"><dc:Bounds x="100" y="30" width="3200" height="80" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="Part_ByPlus_di" bpmnElement="Part_ByPlus" isHorizontal="true"><dc:Bounds x="100" y="150" width="3200" height="950" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="L_Prop_di" bpmnElement="L_Prop" isHorizontal="true"><dc:Bounds x="130" y="150" width="3170" height="370" /></bpmndi:BPMNShape><bpmndi:BPMNShape id="L_Trab_di" bpmnElement="L_Trab" isHorizontal="true"><dc:Bounds x="130" y="520" width="3170" height="150" /></bpmndi:BPMNShape><bpmndi:BPMNShape id="L_App_di" bpmnElement="L_App" isHorizontal="true"><dc:Bounds x="130" y="670" width="3170" height="280" /></bpmndi:BPMNShape><bpmndi:BPMNShape id="L_N8N_di" bpmnElement="L_N8N" isHorizontal="true"><dc:Bounds x="130" y="950" width="3170" height="150" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="Inicio_Entrada_di" bpmnElement="Inicio_Entrada"><dc:Bounds x="482" y="577" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="462" y="620" width="76" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="T_Entrada_di" bpmnElement="T_Entrada"><dc:Bounds x="560" y="555" width="120" height="80" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="T_GuardarEntrada_di" bpmnElement="T_GuardarEntrada"><dc:Bounds x="560" y="700" width="120" height="80" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="Fin_Entrada_di" bpmnElement="Fin_Entrada"><dc:Bounds x="722" y="722" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="700" y="765" width="80" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="Inicio_di" bpmnElement="Inicio"><dc:Bounds x="622" y="282" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="592" y="325" width="96" height="27" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="T_Tablero_di" bpmnElement="T_Tablero"><dc:Bounds x="700" y="260" width="120" height="80" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="GW_Conteo_di" bpmnElement="GW_Conteo" isMarkerVisible="true"><dc:Bounds x="860" y="275" width="50" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="838" y="330" width="94" height="27" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="T_Conteo_di" bpmnElement="T_Conteo"><dc:Bounds x="950" y="160" width="120" height="80" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="GW_UneConteo_di" bpmnElement="GW_UneConteo" isMarkerVisible="true"><dc:Bounds x="1110" y="275" width="50" height="50" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="T_Sugeridos_di" bpmnElement="T_Sugeridos"><dc:Bounds x="1075" y="700" width="120" height="80" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="T_Determinar_di" bpmnElement="T_Determinar"><dc:Bounds x="1220" y="260" width="120" height="80" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="GW_Pedido_di" bpmnElement="GW_Pedido" isMarkerVisible="true"><dc:Bounds x="1380" y="275" width="50" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="1360" y="232" width="90" height="27" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="Fin_SinPedido_di" bpmnElement="Fin_SinPedido"><dc:Bounds x="1387" y="402" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="1369" y="445" width="72" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="T_Borrador_di" bpmnElement="T_Borrador"><dc:Bounds x="1480" y="260" width="120" height="80" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="T_Aprobar_di" bpmnElement="T_Aprobar"><dc:Bounds x="1640" y="260" width="120" height="80" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="GW_Reenvio_di" bpmnElement="GW_Reenvio" isMarkerVisible="true"><dc:Bounds x="1800" y="275" width="50" height="50" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="T_Enviar_di" bpmnElement="T_Enviar"><dc:Bounds x="1875" y="250" width="150" height="100" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="GW_Amplia_di" bpmnElement="GW_Amplia" isMarkerVisible="true"><dc:Bounds x="2070" y="275" width="50" height="50" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="GW_Espera_di" bpmnElement="GW_Espera"><dc:Bounds x="2160" y="275" width="50" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="2195" y="330" width="80" height="40" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="EV_Conf_di" bpmnElement="EV_Conf"><dc:Bounds x="2280" y="192" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="2200" y="163" width="75" height="40" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="T_RegConf_di" bpmnElement="T_RegConf"><dc:Bounds x="2360" y="170" width="120" height="80" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="Fin_Conf_di" bpmnElement="Fin_Conf"><dc:Bounds x="2530" y="192" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="2502" y="235" width="92" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="EV_Falta_di" bpmnElement="EV_Falta"><dc:Bounds x="2280" y="282" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="2318" y="318" width="130" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="EV_Timer_di" bpmnElement="EV_Timer"><dc:Bounds x="2280" y="402" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="2250" y="442" width="96" height="27" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="GW_Hora_di" bpmnElement="GW_Hora" isMarkerVisible="true"><dc:Bounds x="2355" y="395" width="50" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="2392" y="445" width="120" height="53" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="GW_UneCambio_di" bpmnElement="GW_UneCambio" isMarkerVisible="true"><dc:Bounds x="2455" y="335" width="50" height="50" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="T_Cancelar_di" bpmnElement="T_Cancelar"><dc:Bounds x="2540" y="320" width="120" height="80" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="GW_Otro_di" bpmnElement="GW_Otro" isMarkerVisible="true"><dc:Bounds x="2690" y="335" width="50" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="2603" y="405" width="105" height="27" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="Fin_SinProveedor_di" bpmnElement="Fin_SinProveedor"><dc:Bounds x="2697" y="432" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="2742" y="437" width="110" height="27" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="T_Alt_di" bpmnElement="T_Alt"><dc:Bounds x="2780" y="320" width="120" height="80" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="T_Actualizar_di" bpmnElement="T_Actualizar"><dc:Bounds x="2930" y="320" width="120" height="80" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="Inicio_Atencion_di" bpmnElement="Inicio_Atencion"><dc:Bounds x="1382" y="577" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="1352" y="620" width="96" height="27" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="T_Atencion_di" bpmnElement="T_Atencion"><dc:Bounds x="1450" y="555" width="120" height="80" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="GW_Saldo_di" bpmnElement="GW_Saldo" isMarkerVisible="true"><dc:Bounds x="1485" y="755" width="50" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="1418" y="812" width="86" height="27" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="Fin_Rechazo_di" bpmnElement="Fin_Rechazo"><dc:Bounds x="1492" y="862" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="1450" y="902" width="120" height="27" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="GW_Entrega_di" bpmnElement="GW_Entrega" isMarkerVisible="true"><dc:Bounds x="1575" y="755" width="50" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="1553" y="716" width="94" height="27" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="T_NoAtendida_di" bpmnElement="T_NoAtendida"><dc:Bounds x="1580" y="840" width="130" height="80" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="Fin_NoAtendida_di" bpmnElement="Fin_NoAtendida"><dc:Bounds x="1730" y="862" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="1706" y="902" width="84" height="27" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="T_Guardar_di" bpmnElement="T_Guardar"><dc:Bounds x="1660" y="740" width="120" height="80" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="GW_Umbral_di" bpmnElement="GW_Umbral" isMarkerVisible="true"><dc:Bounds x="1820" y="755" width="50" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="1790" y="703" width="110" height="40" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="Fin_SinAlerta_di" bpmnElement="Fin_SinAlerta"><dc:Bounds x="1827" y="862" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="1870" y="867" width="80" height="27" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="T_Alerta_di" bpmnElement="T_Alerta"><dc:Bounds x="1910" y="740" width="120" height="80" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="GW_UneRe_di" bpmnElement="GW_UneRe" isMarkerVisible="true"><dc:Bounds x="1945" y="990" width="50" height="50" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="T_Correo_di" bpmnElement="T_Correo"><dc:Bounds x="2030" y="975" width="120" height="80" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="GW_Envio_di" bpmnElement="GW_Envio" isMarkerVisible="true"><dc:Bounds x="2185" y="855" width="50" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="2100" y="866" width="80" height="27" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="T_Enviada_di" bpmnElement="T_Enviada"><dc:Bounds x="2260" y="740" width="120" height="80" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="Fin_Enviada_di" bpmnElement="Fin_Enviada"><dc:Bounds x="2420" y="762" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="2462" y="773" width="76" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="T_Fallida_di" bpmnElement="T_Fallida"><dc:Bounds x="2260" y="840" width="120" height="80" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="GW_Intentos_di" bpmnElement="GW_Intentos" isMarkerVisible="true"><dc:Bounds x="2420" y="855" width="50" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="2458" y="826" width="90" height="27" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="Fin_Fallida_di" bpmnElement="Fin_Fallida"><dc:Bounds x="2520" y="862" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="2562" y="866" width="120" height="27" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="A_Leyenda_di" bpmnElement="A_Leyenda"><dc:Bounds x="170" y="165" width="300" height="110" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="A_Espera_di" bpmnElement="A_Espera"><dc:Bounds x="2010" y="160" width="160" height="80" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="A_Aprob_di" bpmnElement="A_Aprob"><dc:Bounds x="3080" y="312" width="160" height="100" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="A_Sug_di" bpmnElement="A_Sug"><dc:Bounds x="850" y="705" width="190" height="55" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="A_SinConteo_di" bpmnElement="A_SinConteo"><dc:Bounds x="1345" y="672" width="135" height="80" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="A_Regresa_di" bpmnElement="A_Regresa"><dc:Bounds x="1600" y="585" width="270" height="45" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="A_Umbral_di" bpmnElement="A_Umbral"><dc:Bounds x="1360" y="975" width="440" height="62" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="A_Reint_di" bpmnElement="A_Reint"><dc:Bounds x="2480" y="955" width="215" height="92" /></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="G_Entrada_di" bpmnElement="G_Entrada"><dc:Bounds x="445" y="535" width="345" height="290" /><bpmndi:BPMNLabel><dc:Bounds x="688" y="545" width="95" height="55" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+<bpmndi:BPMNShape id="G_Atencion_di" bpmnElement="G_Atencion"><dc:Bounds x="1335" y="535" width="1360" height="560" /><bpmndi:BPMNLabel><dc:Bounds x="1880" y="548" width="300" height="27" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+<bpmndi:BPMNEdge id="E1_di" bpmnElement="E1"><di:waypoint x="518" y="595" /><di:waypoint x="560" y="595" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="E2_di" bpmnElement="E2"><di:waypoint x="620" y="635" /><di:waypoint x="620" y="700" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="E3_di" bpmnElement="E3"><di:waypoint x="680" y="740" /><di:waypoint x="722" y="740" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="B1_di" bpmnElement="B1"><di:waypoint x="658" y="300" /><di:waypoint x="700" y="300" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="B2_di" bpmnElement="B2"><di:waypoint x="820" y="300" /><di:waypoint x="860" y="300" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="B3_di" bpmnElement="B3"><di:waypoint x="885" y="275" /><di:waypoint x="885" y="200" /><di:waypoint x="950" y="200" /><bpmndi:BPMNLabel><dc:Bounds x="892" y="226" width="14" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="B4_di" bpmnElement="B4"><di:waypoint x="910" y="300" /><di:waypoint x="1110" y="300" /><bpmndi:BPMNLabel><dc:Bounds x="1000" y="282" width="15" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="B5_di" bpmnElement="B5"><di:waypoint x="1070" y="200" /><di:waypoint x="1135" y="200" /><di:waypoint x="1135" y="275" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="B6_di" bpmnElement="B6"><di:waypoint x="1135" y="325" /><di:waypoint x="1135" y="700" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="B7_di" bpmnElement="B7"><di:waypoint x="1195" y="740" /><di:waypoint x="1280" y="740" /><di:waypoint x="1280" y="340" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="B8_di" bpmnElement="B8"><di:waypoint x="1340" y="300" /><di:waypoint x="1380" y="300" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="B9_di" bpmnElement="B9"><di:waypoint x="1405" y="325" /><di:waypoint x="1405" y="402" /><bpmndi:BPMNLabel><dc:Bounds x="1412" y="355" width="15" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="B10_di" bpmnElement="B10"><di:waypoint x="1430" y="300" /><di:waypoint x="1480" y="300" /><bpmndi:BPMNLabel><dc:Bounds x="1448" y="282" width="14" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="B11_di" bpmnElement="B11"><di:waypoint x="1600" y="300" /><di:waypoint x="1640" y="300" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="B12_di" bpmnElement="B12"><di:waypoint x="1760" y="300" /><di:waypoint x="1800" y="300" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="B13_di" bpmnElement="B13"><di:waypoint x="1850" y="300" /><di:waypoint x="1875" y="300" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="B14_di" bpmnElement="B14"><di:waypoint x="2025" y="300" /><di:waypoint x="2070" y="300" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="B15_di" bpmnElement="B15"><di:waypoint x="2120" y="300" /><di:waypoint x="2160" y="300" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="B16_di" bpmnElement="B16"><di:waypoint x="2185" y="275" /><di:waypoint x="2185" y="210" /><di:waypoint x="2280" y="210" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="B17_di" bpmnElement="B17"><di:waypoint x="2210" y="300" /><di:waypoint x="2280" y="300" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="B18_di" bpmnElement="B18"><di:waypoint x="2185" y="325" /><di:waypoint x="2185" y="420" /><di:waypoint x="2280" y="420" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="B19_di" bpmnElement="B19"><di:waypoint x="2316" y="210" /><di:waypoint x="2360" y="210" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="B20_di" bpmnElement="B20"><di:waypoint x="2480" y="210" /><di:waypoint x="2530" y="210" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="B21_di" bpmnElement="B21"><di:waypoint x="2298" y="318" /><di:waypoint x="2298" y="360" /><di:waypoint x="2455" y="360" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="B22_di" bpmnElement="B22"><di:waypoint x="2316" y="420" /><di:waypoint x="2355" y="420" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="B23_di" bpmnElement="B23"><di:waypoint x="2405" y="420" /><di:waypoint x="2480" y="420" /><di:waypoint x="2480" y="385" /><bpmndi:BPMNLabel><dc:Bounds x="2432" y="402" width="14" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="B24_di" bpmnElement="B24"><di:waypoint x="2380" y="445" /><di:waypoint x="2380" y="478" /><di:waypoint x="2095" y="478" /><di:waypoint x="2095" y="325" /><bpmndi:BPMNLabel><dc:Bounds x="2130" y="482" width="120" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="B25_di" bpmnElement="B25"><di:waypoint x="2505" y="360" /><di:waypoint x="2540" y="360" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="B26_di" bpmnElement="B26"><di:waypoint x="2660" y="360" /><di:waypoint x="2690" y="360" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="B26b_di" bpmnElement="B26b"><di:waypoint x="2740" y="360" /><di:waypoint x="2780" y="360" /><bpmndi:BPMNLabel><dc:Bounds x="2750" y="342" width="14" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="B26c_di" bpmnElement="B26c"><di:waypoint x="2715" y="385" /><di:waypoint x="2715" y="432" /><bpmndi:BPMNLabel><dc:Bounds x="2722" y="397" width="15" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="B27_di" bpmnElement="B27"><di:waypoint x="2900" y="360" /><di:waypoint x="2930" y="360" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="B28_di" bpmnElement="B28"><di:waypoint x="2990" y="400" /><di:waypoint x="2990" y="508" /><di:waypoint x="1825" y="508" /><di:waypoint x="1825" y="325" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="A1_di" bpmnElement="A1"><di:waypoint x="1418" y="595" /><di:waypoint x="1450" y="595" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="A2_di" bpmnElement="A2"><di:waypoint x="1510" y="635" /><di:waypoint x="1510" y="755" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="A3_di" bpmnElement="A3"><di:waypoint x="1510" y="805" /><di:waypoint x="1510" y="862" /><bpmndi:BPMNLabel><dc:Bounds x="1516" y="825" width="14" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="A3b_di" bpmnElement="A3b"><di:waypoint x="1535" y="780" /><di:waypoint x="1575" y="780" /><bpmndi:BPMNLabel><dc:Bounds x="1542" y="762" width="15" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="A4_di" bpmnElement="A4"><di:waypoint x="1625" y="780" /><di:waypoint x="1660" y="780" /><bpmndi:BPMNLabel><dc:Bounds x="1632" y="762" width="14" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="A4b_di" bpmnElement="A4b"><di:waypoint x="1600" y="805" /><di:waypoint x="1600" y="840" /><bpmndi:BPMNLabel><dc:Bounds x="1606" y="823" width="100" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="A4c_di" bpmnElement="A4c"><di:waypoint x="1710" y="880" /><di:waypoint x="1730" y="880" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="A5_di" bpmnElement="A5"><di:waypoint x="1780" y="780" /><di:waypoint x="1820" y="780" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="A6_di" bpmnElement="A6"><di:waypoint x="1845" y="805" /><di:waypoint x="1845" y="862" /><bpmndi:BPMNLabel><dc:Bounds x="1851" y="825" width="15" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="A7_di" bpmnElement="A7"><di:waypoint x="1870" y="780" /><di:waypoint x="1910" y="780" /><bpmndi:BPMNLabel><dc:Bounds x="1882" y="762" width="14" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="A8_di" bpmnElement="A8"><di:waypoint x="1970" y="820" /><di:waypoint x="1970" y="990" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="A8b_di" bpmnElement="A8b"><di:waypoint x="1995" y="1015" /><di:waypoint x="2030" y="1015" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="A9_di" bpmnElement="A9"><di:waypoint x="2150" y="1015" /><di:waypoint x="2210" y="1015" /><di:waypoint x="2210" y="905" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="A10_di" bpmnElement="A10"><di:waypoint x="2210" y="855" /><di:waypoint x="2210" y="780" /><di:waypoint x="2260" y="780" /><bpmndi:BPMNLabel><dc:Bounds x="2216" y="815" width="14" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="A11_di" bpmnElement="A11"><di:waypoint x="2235" y="880" /><di:waypoint x="2260" y="880" /><bpmndi:BPMNLabel><dc:Bounds x="2238" y="862" width="15" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="A12_di" bpmnElement="A12"><di:waypoint x="2380" y="780" /><di:waypoint x="2420" y="780" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="A13_di" bpmnElement="A13"><di:waypoint x="2380" y="880" /><di:waypoint x="2420" y="880" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="A14_di" bpmnElement="A14"><di:waypoint x="2445" y="905" /><di:waypoint x="2445" y="1085" /><di:waypoint x="1970" y="1085" /><di:waypoint x="1970" y="1040" /><bpmndi:BPMNLabel><dc:Bounds x="2110" y="1068" width="290" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="A15_di" bpmnElement="A15"><di:waypoint x="2470" y="880" /><di:waypoint x="2520" y="880" /><bpmndi:BPMNLabel><dc:Bounds x="2482" y="862" width="15" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="AS_Espera_di" bpmnElement="AS_Espera"><di:waypoint x="2120" y="240" /><di:waypoint x="2176" y="284" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="AS_Aprob_di" bpmnElement="AS_Aprob"><di:waypoint x="3080" y="360" /><di:waypoint x="3050" y="360" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="AS_Sug_di" bpmnElement="AS_Sug"><di:waypoint x="1040" y="732" /><di:waypoint x="1075" y="735" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="AS_SinConteo_di" bpmnElement="AS_SinConteo"><di:waypoint x="1480" y="745" /><di:waypoint x="1497" y="768" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="AS_Regresa_di" bpmnElement="AS_Regresa"><di:waypoint x="1600" y="607" /><di:waypoint x="1570" y="603" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="AS_Umbral_di" bpmnElement="AS_Umbral"><di:waypoint x="1800" y="975" /><di:waypoint x="1832" y="793" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="AS_Reint_di" bpmnElement="AS_Reint"><di:waypoint x="2480" y="970" /><di:waypoint x="2458" y="893" /></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="M_Solicitud_di" bpmnElement="M_Solicitud"><di:waypoint x="1950" y="250" /><di:waypoint x="1950" y="110" /><bpmndi:BPMNLabel><dc:Bounds x="1845" y="170" width="100" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="M_Conf_di" bpmnElement="M_Conf"><di:waypoint x="2298" y="110" /><di:waypoint x="2298" y="192" /><bpmndi:BPMNLabel><dc:Bounds x="2305" y="135" width="160" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="M_Falta_di" bpmnElement="M_Falta"><di:waypoint x="3250" y="110" /><di:waypoint x="3250" y="300" /><di:waypoint x="2316" y="300" /><bpmndi:BPMNLabel><dc:Bounds x="2850" y="282" width="180" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+<bpmndi:BPMNEdge id="M_Entrega_di" bpmnElement="M_Entrega"><di:waypoint x="500" y="110" /><di:waypoint x="500" y="577" /><bpmndi:BPMNLabel><dc:Bounds x="505" y="470" width="110" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+</bpmndi:BPMNPlane></bpmndi:BPMNDiagram>
+</bpmn:definitions>

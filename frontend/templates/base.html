@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="csrf-token" content="{{ csrf_token() }}">
+  <link rel="icon" href="data:,">
   <title>{% block titulo %}Demanda360{% endblock %} · Pinturas By-plus</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
   {% block head %}{% endblock %}
@@ -35,9 +36,9 @@
       <header class="encabezado">
         <div>
           <h1>{% block encabezado %}{% endblock %}</h1>
-          <p class="subtitulo">{% block subtitulo %}{% endblock %}</p>
+          <p class="subtitulo" id="subtitulo">{% block subtitulo %}{% endblock %}</p>
         </div>
-        {% if origen_datos == 'SIMULADO' %}<span class="etiqueta etiqueta-simulado">Datos simulados</span>{% endif %}
+        <span class="etiqueta etiqueta-simulado" id="etiqueta-simulado"{% if origen_datos != 'SIMULADO' %} hidden{% endif %}>Datos simulados</span>
       </header>
       {% block contenido %}{% endblock %}
     </main>

@@ -17,6 +17,7 @@ const USE_MOCK = typeof window.USE_MOCK === "boolean"
 const MOCKS = {
   "GET /api/health": "health.json",
   "GET /api/productos": "productos.json",
+  "GET /api/catalogos": "catalogos.json",
   "GET /api/productos/1": "producto_detalle.json",
   "GET /api/dashboard": "dashboard.json",
   "GET /api/analisis/rotacion": "rotacion.json",
@@ -28,6 +29,8 @@ const MOCKS = {
   "POST /api/ventas": "venta_creada.json",
   "POST /api/movimientos": "movimiento_creado.json",
   "POST /api/pedidos": "pedido_creado.json",
+  "POST /api/pedidos/6/aprobar": "pedido_actualizado.json",
+  "POST /api/pedidos/7/estado": "pedido_actualizado.json",
 };
 
 function csrfToken() {

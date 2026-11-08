@@ -1,7 +1,11 @@
 """Comandos de administración: `flask <comando>` (dentro del contenedor: `docker compose exec web flask <comando>`)."""
 
+from pathlib import Path
+
 import click
-from flask import Flask
+import psycopg
+from flask import Flask, current_app
+from sqlalchemy.engine import make_url
 
 from .extensions import db
 from .models import Usuario
@@ -13,6 +17,27 @@ USUARIOS_DEMO = (
     ("trabajador", "Trabajador (demo)", ROL_TRABAJADOR, "DEMO_PASSWORD_TRABAJADOR"),
 )
 LONGITUD_MINIMA = 10
+
+RAIZ = Path(__file__).resolve().parents[2]
+SQL_VISTAS = RAIZ / "database" / "sql" / "02_vistas.sql"
+SQL_DEMO = RAIZ / "database" / "seeds" / "10_demo.sql"
+
+
+def _ejecutar_sql(archivo: Path) -> None:
+    """Corre un archivo .sql completo con psycopg (sin parámetros: los % y : del texto no se interpretan).
+
+    Los archivos traen su propio BEGIN/COMMIT o son idempotentes; si algo falla,
+    PostgreSQL deshace la transacción y aquí se muestra el mensaje sin trazas.
+    """
+    if not archivo.exists():
+        raise click.ClickException(f"No se encontró {archivo}.")
+    url = make_url(current_app.config["SQLALCHEMY_DATABASE_URI"]).set(drivername="postgresql")
+    try:
+        with psycopg.connect(url.render_as_string(hide_password=False), autocommit=True) as conn:
+            conn.execute(archivo.read_text(encoding="utf-8"))
+    except psycopg.Error as e:
+        mensaje = (e.diag.message_primary if getattr(e, "diag", None) else None) or str(e).splitlines()[0]
+        raise click.ClickException(f"{archivo.name}: {mensaje}") from None
 
 
 def _validar_clave(clave: str) -> str:
@@ -56,3 +81,40 @@ def registrar_comandos(app: Flask) -> None:
                                     detalle={"rol": rol, "origen": "cli"}, usuario_id=nuevo.id)
                 click.echo(f"✓ Usuario '{usuario}' creado con rol {rol}.")
         db.session.commit()
+
+    @app.cli.command("aplicar-vistas")
+    def aplicar_vistas() -> None:
+        """(Re)crea las funciones y vistas de database/sql/02_vistas.sql. No borra datos."""
+        _ejecutar_sql(SQL_VISTAS)
+        click.echo("✓ Vistas y funciones de KPI actualizadas.")
+
+    @app.cli.command("cargar-demo")
+    def cargar_demo() -> None:
+        """Carga los datos SIMULADOS de septiembre (database/seeds/10_demo.sql).
+
+        Solo funciona en una base sin productos y con los usuarios demo creados.
+        Antes actualiza las vistas, y al final muestra los KPI del 30 de septiembre.
+        """
+        _ejecutar_sql(SQL_VISTAS)
+        _ejecutar_sql(SQL_DEMO)
+        filas = db.session.execute(db.text(
+            "SELECT codigo, nombre, valor, unidad, detalle FROM fn_kpi_resumen(DATE '2026-09-30')"
+        )).all()
+        click.echo("✓ Datos demo cargados (SIMULADOS, 1–30 sep 2026). KPI al 30 de septiembre:")
+        for codigo, nombre, valor, unidad, detalle in filas:
+            click.echo(f"  {codigo} {nombre}: {valor} {unidad} · {detalle}")
+
+    @app.cli.command("reintentar-alertas")
+    def reintentar_alertas() -> None:
+        """Reenvía a n8n las alertas FALLIDAS (y PENDIENTES atascadas), máximo 3 intentos, mismo evento_id."""
+        from .services import alertas
+
+        ids = alertas.pendientes_de_reintento()
+        if not ids:
+            click.echo("· No hay alertas por reintentar.")
+            return
+        for alerta_id in ids:
+            a = alertas.enviar(alerta_id)
+            marca = "✓" if a.estado == "ENVIADA" else "✗"
+            click.echo(f"{marca} {a.evento_id} → {a.estado} (intento {a.intentos})"
+                       + (f": {a.ultimo_error}" if a.ultimo_error else ""))

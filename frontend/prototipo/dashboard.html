@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="es">
+<!--
+  PROTOTIPO (Rol 4) · Dashboard
+  Se abre con Live Server tomando la carpeta frontend/ como raíz y usa los mocks de static/mock/.
+  La LÓGICA no vive aquí: es static/js/comun.js + static/js/dashboard.js, los mismos archivos que usa
+  Flask en frontend/templates/dashboard.html. Un cambio de comportamiento se hace allí una sola vez.
+  Este archivo solo conserva el marco del prototipo (menú, «Ver como», aviso de mocks).
+-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Dashboard · Pinturas By-plus</title>
+  <link rel="stylesheet" href="../static/css/estilos.css">
+  <style>
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+  .kpi-valor { font-size: 28px; font-weight: 700; margin: 8px 0 4px; }
+</style>
+  <style>.aviso-mock { background: var(--simulado-fondo); color: var(--simulado-texto); }</style>
+</head>
+<!-- data-rol lo pone base.html en Flask. En el prototipo "" = vista de trabajador. -->
+<body data-rol="">
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="marca">
+        <div class="marca-icono" aria-hidden="true">◫</div>
+        <div>
+          <div class="marca-nombre">Demanda360</div>
+          <div class="marca-sub">Pinturas By-plus</div>
+        </div>
+      </div>
+      <nav class="menu">
+        <a href="dashboard.html" class="activo">Dashboard</a>
+        <a href="registro.html">Registro</a>
+        <a href="planificacion.html">Planificación de pedidos</a>
+      </nav>
+      <div class="sidebar-pie">
+        <div class="usuario">Prototipo (sin sesión)</div>
+        <label for="ver-como" style="color:#cbd5e1">Ver como (solo prototipo)</label>
+        <select id="ver-como">
+          <option value="">Trabajador</option>
+          <option value="propietario">Propietario</option>
+        </select>
+      </div>
+    </aside>
+
+    <main class="contenido">
+      <header class="encabezado">
+        <div>
+          <h1>Dashboard</h1>
+          <p class="subtitulo" id="subtitulo">Cargando…</p>
+        </div>
+        <span class="etiqueta etiqueta-simulado" id="etiqueta-simulado" hidden>Datos simulados</span>
+      </header>
+
+<div class="alerta alerta-error" id="error" role="alert" hidden></div>
+
+<section aria-label="Indicadores">
+  <p class="nota" id="nota-kpis"></p>
+  <div class="kpis" id="kpis"></div>
+</section>
+
+<section class="tarjeta">
+  <h2>Productos críticos y agotados</h2>
+  <p class="nota">Saldo actual (existencia de hoy).</p>
+  <table class="tabla">
+    <thead>
+      <tr><th>SKU</th><th>Producto</th><th>Saldo</th><th>Umbral</th><th>Entrega (días)</th><th>Estado</th></tr>
+    </thead>
+    <tbody id="tabla-criticos"></tbody>
+  </table>
+</section>
+
+<section class="tarjeta">
+  <h2>Inventario por producto</h2>
+  <p class="nota">Saldo de hoy. Vendidas y no atendidas: periodo de los indicadores (fecha de corte).</p>
+  <table class="tabla">
+    <thead>
+      <tr><th>SKU</th><th>Producto</th><th>Saldo</th><th>Vendidas (periodo)</th><th>No atendidas (periodo)</th><th>Entrega (días)</th><th>Estado</th></tr>
+    </thead>
+    <tbody id="tabla-inventario"></tbody>
+  </table>
+</section>
+
+<p class="nota">El análisis detallado de demanda y rotación está en el tablero de Power BI.</p>
+    </main>
+  </div>
+
+  <script>window.USE_MOCK = true;</script>
+  <script src="../static/js/api.js"></script>
+  <script src="../static/js/comun.js"></script>
+  <script>
+    // «Ver como»: cambia el rol del prototipo y recarga la pantalla con ese rol
+    const verComo = document.getElementById("ver-como");
+    verComo.value = sessionStorage.getItem("prototipo-rol") || "";
+    document.body.dataset.rol = verComo.value;
+    verComo.addEventListener("change", () => { sessionStorage.setItem("prototipo-rol", verComo.value); location.reload(); });
+  </script>
+  <script src="../static/js/dashboard.js"></script>
+</body>
+</html>

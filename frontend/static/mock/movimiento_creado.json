@@ -10,6 +10,7 @@
     "sku": "LAC-BP-01",
     "saldo_anterior": 0,
     "saldo_actual": 24,
+    "umbral_reposicion": 6,
     "estado": "NORMAL"
   }
 }

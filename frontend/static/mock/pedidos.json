@@ -3,17 +3,23 @@
   "pedidos": [
     {
       "id": 7,
+      "proveedor_id": 1,
       "proveedor": "Suministros Andinos (ficticio)",
+      "plazo_entrega_dias": 3,
       "estado": "ENVIADO",
       "numero_intento": 1,
       "pedido_anterior_id": null,
+      "reintento_id": null,
       "fecha_creacion": "2026-11-08T10:00:00-05:00",
       "fecha_aprobacion": "2026-11-08T10:20:00-05:00",
       "fecha_envio": "2026-11-08T10:30:00-05:00",
       "fecha_respuesta": null,
+      "fecha_entrega_estimada": null,
       "horas_esperando": 5.2,
+      "motivo_cancelacion": null,
       "detalles": [
         {
+          "producto_id": 1,
           "sku": "LAC-BP-01",
           "nombre": "Laca catalizada alto brillo galón",
           "cantidad_sugerida": 24,
@@ -23,17 +29,23 @@
     },
     {
       "id": 6,
+      "proveedor_id": 2,
       "proveedor": "Distribuidora Cordillera (ficticio)",
+      "plazo_entrega_dias": 4,
       "estado": "BORRADOR",
       "numero_intento": 1,
       "pedido_anterior_id": null,
+      "reintento_id": null,
       "fecha_creacion": "2026-11-08T09:50:00-05:00",
       "fecha_aprobacion": null,
       "fecha_envio": null,
       "fecha_respuesta": null,
+      "fecha_entrega_estimada": null,
       "horas_esperando": null,
+      "motivo_cancelacion": null,
       "detalles": [
         {
+          "producto_id": 2,
           "sku": "LAC-BP-02",
           "nombre": "Laca catalizada mate galón",
           "cantidad_sugerida": 10,

@@ -1,0 +1,51 @@
+{
+  "categorias": [
+    {
+      "id": 2,
+      "nombre": "Esmaltes"
+    },
+    {
+      "id": 1,
+      "nombre": "Lacas"
+    },
+    {
+      "id": 3,
+      "nombre": "Selladores"
+    }
+  ],
+  "proveedores": [
+    {
+      "id": 2,
+      "codigo": "DIS-COR",
+      "nombre": "Distribuidora Cordillera (ficticio)",
+      "plazo_entrega_dias": 4
+    },
+    {
+      "id": 4,
+      "codigo": "PIN-LLA",
+      "nombre": "Pinturas del Llano (ficticio)",
+      "plazo_entrega_dias": 7
+    },
+    {
+      "id": 3,
+      "codigo": "QUI-SAB",
+      "nombre": "Químicos La Sabana (ficticio)",
+      "plazo_entrega_dias": 5
+    },
+    {
+      "id": 1,
+      "codigo": "SUM-AND",
+      "nombre": "Suministros Andinos (ficticio)",
+      "plazo_entrega_dias": 3
+    }
+  ],
+  "unidades_medida": [
+    "unidad",
+    "galon",
+    "medio_galon",
+    "cuarto_galon",
+    "cunete",
+    "litro",
+    "kilogramo"
+  ]
+}
