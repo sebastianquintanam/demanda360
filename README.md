@@ -13,7 +13,30 @@ Proyecto integrador · Fundamentos de Sistemas de Información · Universidad EA
 | Automatización | n8n | http://127.0.0.1:5678 |
 | Analítica | Power BI Desktop (lee CSV de `analytics/datos_demo/`) | — |
 
-Especificación completa: [`docs/contexto/plan_mvp_demanda360.md`](docs/contexto/plan_mvp_demanda360.md). Contrato de la API: [`docs/api/contrato.md`](docs/api/contrato.md).
+Especificación completa: [`docs/contexto/plan_mvp_demanda360.md`](docs/contexto/plan_mvp_demanda360.md). Contrato de la API: [`docs/api/contrato.md`](docs/api/contrato.md). Modelo de datos: [`docs/arquitectura/modelo_datos.md`](docs/arquitectura/modelo_datos.md). Sección técnica para el documento final: [`docs/arquitectura/seccion_tecnica.md`](docs/arquitectura/seccion_tecnica.md).
+
+## Estado de la versión 1.0
+
+| Alcance | Estado |
+| --- | --- |
+| **P0:** login con dos roles, catálogo con SKU único, conteos, ventas (solicitado y entregado), entradas, ajustes justificados, saldo y estado por producto, alerta n8n con reintento, auditoría, KPI 1–3, respaldo y restauración | Implementado y probado |
+| **P1:** cantidades sugeridas, borrador de pedido, aprobación del propietario, estados del pedido con reintento a otro proveedor, KPI 4–5, CSV para Power BI | Implementado y probado |
+| Pruebas automáticas | 150 pruebas contra PostgreSQL 16 real, en verde en cada PR (CI) |
+| Propuesto, fuera del MVP | IA o pronóstico de demanda, edición de umbral y proveedor desde pantallas, alertas por ajustes inusuales, conexión de Power BI en vivo |
+
+**Los 13 criterios de la demo** (contexto maestro, sección 20) y dónde se muestran:
+
+| # | Criterio | Dónde |
+| --- | --- | --- |
+| 1–3 | Crear producto, rechazar SKU repetido (409), rechazar cantidad inválida (400) | `POST /api/productos` y formularios de Registro |
+| 4–6 | Conteo, venta y saldo correcto | Pantalla Registro: el resultado muestra saldo antes → después |
+| 7 | Cambio no autorizado bloqueado | Trabajador: ajuste o aprobación → 403. Base: `UPDATE` sobre `movimientos` → error del trigger |
+| 8 | Alerta | Venta que cruza el umbral → fila `ENVIADA` y correo. Con n8n apagado: `FALLIDA` → `flask reintentar-alertas` → `ENVIADA` |
+| 9–10 | Movimiento visible en los datos y KPI calculado | Dashboard de Flask, `analytics/datos_demo/*.csv` y Power BI |
+| 11–12 | Respaldo y restauración | `scripts/backup.sh` y `scripts/restore_prueba.sh` |
+| 13 | Consulta de auditoría | `GET /api/auditoria` como propietario |
+
+**Limitaciones que se declaran:** no hay línea base real, así que los KPI muestran cómo se mediría y no una mejora comprobada. El RTO y el RPO solo se miden en el entorno de demostración. Las sugerencias son reglas, sin IA. El sistema se propone como piloto: Pinturas By-plus no lo usa todavía.
 
 ---
 
@@ -40,6 +63,28 @@ docker compose exec web flask crear-usuarios-demo
 
 Abre http://127.0.0.1:8000 e ingresa como `propietario` o `trabajador`.
 Comprobación rápida: `curl http://127.0.0.1:8000/api/health` → `{"estado":"ok","bd":"ok"}`.
+
+```bash
+# 6. Cargar los datos demo de septiembre (imprime los KPI: 27,3 %, 8,6 %, 50 %, 4,7 h y 66,7 %)
+docker compose exec web flask cargar-demo
+```
+
+> En zsh (Mac), los comentarios `#` dentro de un bloque pegado dan error. Copia solo las líneas de comando o activa `setopt interactivecomments`.
+
+### Configurar la alerta en n8n (una vez por equipo)
+
+1. Abre http://127.0.0.1:5678 y crea la cuenta local de n8n.
+2. **Workflows → Import from File** → `automation/workflows/alerta_stock_critico.json`.
+3. Nodo **Webhook** → *Credential for Header Auth* → crear una nueva: *Name* = `X-Demanda360-Token`, *Value* = el `N8N_WEBHOOK_TOKEN` de tu `.env`. Para copiarlo sin mostrarlo en pantalla:
+   - Mac: `grep '^N8N_WEBHOOK_TOKEN=' .env | cut -d= -f2- | tr -d '\n' | pbcopy`
+   - Ubuntu: lo mismo terminando en `xclip -selection clipboard` (`sudo apt install xclip`).
+4. Nodo **Send an Email** → credencial SMTP. Con Gmail: host `smtp.gmail.com`, puerto 465, SSL activado y una **contraseña de aplicación** (no la de la cuenta). Cambia *From Email* y *To Email*, que vienen con correos de ejemplo.
+5. **Publish** (arriba a la derecha). El backend usa la URL de producción `http://n8n:5678/webhook/alerta-stock-critico`; la *Test URL* no se usa.
+6. Comprueba que la web llega a n8n y que el token se exige. Sin token debe responder **403**:
+
+```bash
+docker compose exec web python -c "import requests; r = requests.post('http://n8n:5678/webhook/alerta-stock-critico', json={}); print(r.status_code)"
+```
 
 **Recargar la base desde cero** (los scripts de `database/sql/` solo corren cuando el volumen está vacío):
 
@@ -147,6 +192,8 @@ Abre la carpeta `frontend/` en VS Code y usa **Live Server**. Las páginas de `f
 | `analytics/` (salvo `datos_demo/`), `docs/requerimientos/kpi.md`, `diccionario_datos.md` | Rol 3 · Windows datos | Verificación de KPI, Power BI, fichas |
 | `automation/`, `docs/seguridad/`, `docs/evidencias/` | Rol 2 · Ubuntu | Flujo n8n, matriz de riesgos, respaldos, evidencias |
 | `scripts/` | Rol 1 escribe · Rol 2 ejecuta y documenta | Respaldo y restauración |
+| `docs/arquitectura/`, `docs/api/` | Rol 1 · Mac | Arquitectura, modelo de datos, sección técnica, contrato de la API |
+| `docs/requerimientos/requerimientos.md` | Rol 4 | Requerimientos RF y RNF, trazabilidad de riesgos |
 
 `.github/CODEOWNERS` asigna los revisores por carpeta.
 
