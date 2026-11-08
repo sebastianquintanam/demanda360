@@ -19,6 +19,7 @@ RUN pip install -r backend/requirements.txt
 COPY backend/ backend/
 COPY frontend/ frontend/
 COPY database/sql/ database/sql/
+COPY database/seeds/10_demo.sql database/seeds/10_demo.sql
 
 WORKDIR /app/backend
 USER demanda

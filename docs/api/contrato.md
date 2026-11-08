@@ -9,6 +9,7 @@
 | --- | --- | --- |
 | `GET /api/health` | P0 | Implementada (etapa 1) |
 | `GET /api/auditoria` | P0 | Implementada (etapa 1) |
+| Cálculos en SQL: saldo, estado, KPI 1–5, sugeridos (`02_vistas.sql`) | P0/P1 | Implementados (etapa 2) |
 | Productos, conteos, ventas, movimientos, dashboard, rotación | P0 | Etapa 3 |
 | Sugeridos y pedidos | P1 | Etapa 5 |
 
@@ -21,11 +22,13 @@
 - **CSRF inválido o ausente** en un `POST /api/*`: `400 VALIDACION` con `campos: {"csrf": "invalido"}`.
 - **Sesión y rol en pantallas:** `base.html` deja el rol en `<body data-rol="...">`. Los elementos con clase `solo-propietario` se ocultan al trabajador (solo comodidad visual: el backend igual responde 403).
 
-## Decisiones abiertas (pendientes de aprobar)
+## Decisiones aprobadas (8 nov 2026)
 
-1. **Cliente que regresa (`solicitud_previa_id`).** El plan dice «no se crea otra solicitud». Propuesta: sí se crea la fila de atención, enlazada con `solicitud_previa_id`, y la vista del KPI 2 la excluye del denominador. Ventaja: toda VENTA nace de una atención (trazabilidad completa) y la regla del KPI vive en un solo lugar. El esquema ya lo soporta.
-2. **Proveedores de la demo.** En el Figma un solo proveedor tiene plazos de 3, 4 y 5 días, pero el plazo vive en el proveedor. Los datos simulados usan 4 proveedores ficticios (3, 4, 5 y 7 días) para conservar las columnas «Entrega (d)» del Figma.
-3. **Fecha de corte de los KPI.** Ver la nota de la etapa 2 en el README.
+1. **Fecha de corte de los KPI: 30 de septiembre de 2026, 23:59:59 (Bogotá).** Los KPI, la rotación y los días con registro se calculan sobre los 30 días que terminan el día de corte. En SQL el límite es «antes del 1 de octubre a las 00:00», que equivale y no pierde fracciones de segundo. El **saldo en pantalla es el de hoy** (todos los movimientos): una venta en vivo cambia el saldo, el estado y dispara la alerta, pero no mueve los KPI de septiembre. Las rutas de KPI aceptan `?corte=AAAA-MM-DD`; sin el parámetro usan `fn_corte()` (2026-09-30).
+2. **Cliente que regresa: no suma demanda y conserva el faltante original.** La venta posterior se registra con `solicitud_previa_id` apuntando a la atención original. Como cada venta necesita su atención y las solicitudes son de solo inserción, en la base queda una fila de atención enlazada, marcada como regreso: no cuenta en lo solicitado ni en lo no atendido (KPI 2), y sus unidades sí cuentan como vendidas. En `POST /api/ventas` el campo `solicitud_previa_id` es opcional (etapa 3).
+3. **Proveedores: un proveedor habitual por producto, con reintento a proveedores alternativos.** El plazo de entrega vive en el proveedor; la demo usa 4 proveedores ficticios (3, 4, 5 y 7 días), como en los mocks. Un pedido cancelado se puede reintentar con otro proveedor: es un pedido nuevo con `pedido_anterior_id` y `numero_intento` + 1, y alimenta el KPI 5. No hay puntuación automática de proveedores.
+
+Cálculos oficiales (saldo, estado, KPI, sugeridos): `database/sql/02_vistas.sql`. Pruebas que exigen las cifras del Figma: `backend/tests/test_kpi_demo.py`.
 
 ---
 
