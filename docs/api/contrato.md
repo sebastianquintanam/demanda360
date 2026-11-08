@@ -39,6 +39,13 @@
 - **`GET /api/catalogos`** (ambos roles): `categorias`, `proveedores` (con `plazo_entrega_dias`) y `unidades_medida`, para los formularios de Registro. Mock: `catalogos.json`.
 - **Cliente que regresa:** `GET /api/productos/{id}` trae `faltantes_pendientes` (atenciones de los últimos 30 días con faltante sin cubrir). La pantalla deja escoger una y envía su `solicitud_id` como `solicitud_previa_id` en `POST /api/ventas`. Reglas: misma referencia, enlazada a la atención original (no a otro regreso) y `cantidad_solicitada` ≤ faltante pendiente; si no, 400.
 - **Sin sesión:** un `POST /api/*` sin sesión responde 401 antes que el chequeo de CSRF, así una sesión vencida lleva al login.
+- **KPI:** el texto explicativo de cada KPI va en `detalle` (no `nota`), como en `dashboard.json`.
+
+## Integración de pantallas
+
+- **Una sola copia de la lógica:** `frontend/static/js/comun.js`, `dashboard.js` y `registro.js`. Las plantillas de Flask (`frontend/templates/`) y los prototipos (`frontend/prototipo/`, con mocks) cargan los mismos archivos. Un cambio de comportamiento se hace una vez.
+- **Diseño:** el Rol 4 sigue siendo dueño del prototipo y de `estilos.css`; las plantillas copian su HTML dentro de `base.html`.
+- **Registro:** el formulario de producto usa `GET /api/catalogos`; el cliente que regresa escoge la atención en una lista (`faltantes_pendientes`); el conteo envía `origen_ref`; el ajuste exige 10 caracteres de justificación también en pantalla.
 
 ## Alerta de stock crítico · contrato con n8n (cerrado el 8 nov 2026)
 
@@ -181,7 +188,7 @@ Si se intenta entregar más de lo disponible: `409 STOCK_INSUFICIENTE`, con el m
   "kpis": [
     { "codigo": "KPI1", "nombre": "Referencias agotadas", "valor": 27.3, "unidad": "%", "numerador": 3, "denominador": 11 },
     { "codigo": "KPI2", "nombre": "Demanda no atendida", "valor": 8.6, "unidad": "%", "numerador": 12, "denominador": 139 },
-    { "codigo": "KPI3", "nombre": "Baja rotación", "valor": 50.0, "unidad": "%", "numerador": 5, "denominador": 10, "nota": "1 referencia con datos insuficientes" }
+    { "codigo": "KPI3", "nombre": "Baja rotación", "valor": 50.0, "unidad": "%", "numerador": 5, "denominador": 10, "detalle": "5 de 10; 1 referencia con datos insuficientes" }
   ],
   "criticos": [
     { "id": 1, "sku": "LAC-BP-01", "nombre": "Laca catalizada alto brillo galón", "saldo": 0, "estado": "AGOTADO", "plazo_entrega_dias": 3 }

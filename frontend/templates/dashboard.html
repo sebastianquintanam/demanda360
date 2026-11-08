@@ -1,10 +1,47 @@
 {% extends "base.html" %}
+{# Diseño: frontend/prototipo/dashboard.html (Rol 4). Lógica: static/js/dashboard.js (la misma del prototipo). #}
 {% block titulo %}Dashboard{% endblock %}
+{% block head %}
+<style>
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+  .kpi-valor { font-size: 28px; font-weight: 700; margin: 8px 0 4px; }
+</style>
+{% endblock %}
 {% block encabezado %}Dashboard{% endblock %}
-{% block subtitulo %}Inventario y demanda · 11 referencias · 1–30 sep 2026{% endblock %}
+{% block subtitulo %}Cargando…{% endblock %}
 {% block contenido %}
-<section class="tarjeta">
-  <p>Pantalla en construcción. El diseño sale de <code>frontend/prototipo/dashboard.html</code> (Rol 4)
-  y se integra aquí en la etapa 6.</p>
+<div class="alerta alerta-error" id="error" role="alert" hidden></div>
+
+<section aria-label="Indicadores">
+  <p class="nota" id="nota-kpis"></p>
+  <div class="kpis" id="kpis"></div>
 </section>
+
+<section class="tarjeta">
+  <h2>Productos críticos y agotados</h2>
+  <p class="nota">Saldo actual (existencia de hoy).</p>
+  <table class="tabla">
+    <thead>
+      <tr><th>SKU</th><th>Producto</th><th>Saldo</th><th>Umbral</th><th>Entrega (días)</th><th>Estado</th></tr>
+    </thead>
+    <tbody id="tabla-criticos"></tbody>
+  </table>
+</section>
+
+<section class="tarjeta">
+  <h2>Inventario por producto</h2>
+  <p class="nota">Saldo de hoy. Vendidas y no atendidas: periodo de los indicadores (fecha de corte).</p>
+  <table class="tabla">
+    <thead>
+      <tr><th>SKU</th><th>Producto</th><th>Saldo</th><th>Vendidas (periodo)</th><th>No atendidas (periodo)</th><th>Entrega (días)</th><th>Estado</th></tr>
+    </thead>
+    <tbody id="tabla-inventario"></tbody>
+  </table>
+</section>
+
+<p class="nota">El análisis detallado de demanda y rotación está en el tablero de Power BI.</p>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/comun.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 {% endblock %}
