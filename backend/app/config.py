@@ -44,10 +44,11 @@ class Config:
     WTF_CSRF_ENABLED = True
     WTF_CSRF_TIME_LIMIT = None  # el token dura lo que dura la sesión
 
-    # Integración con n8n (se usa en la etapa 3)
+    # Integración con n8n (contrato en services/alertas.py). 10 s y no 3: Gmail tarda
+    # ~2,5 s y con 3 s quedarían FALLIDAS alertas que sí se enviaron.
     N8N_WEBHOOK_URL = os.environ.get("N8N_WEBHOOK_URL", "")
     N8N_WEBHOOK_TOKEN = os.environ.get("N8N_WEBHOOK_TOKEN", "")
-    N8N_TIMEOUT_SEGUNDOS = 3
+    N8N_TIMEOUT_SEGUNDOS = 10
 
     # Todo el historial del MVP es simulado y se rotula así
     ORIGEN_DATOS = os.environ.get("ORIGEN_DATOS", "SIMULADO")

@@ -103,3 +103,18 @@ def registrar_comandos(app: Flask) -> None:
         click.echo("✓ Datos demo cargados (SIMULADOS, 1–30 sep 2026). KPI al 30 de septiembre:")
         for codigo, nombre, valor, unidad, detalle in filas:
             click.echo(f"  {codigo} {nombre}: {valor} {unidad} · {detalle}")
+
+    @app.cli.command("reintentar-alertas")
+    def reintentar_alertas() -> None:
+        """Reenvía a n8n las alertas FALLIDAS (y PENDIENTES atascadas), máximo 3 intentos, mismo evento_id."""
+        from .services import alertas
+
+        ids = alertas.pendientes_de_reintento()
+        if not ids:
+            click.echo("· No hay alertas por reintentar.")
+            return
+        for alerta_id in ids:
+            a = alertas.enviar(alerta_id)
+            marca = "✓" if a.estado == "ENVIADA" else "✗"
+            click.echo(f"{marca} {a.evento_id} → {a.estado} (intento {a.intentos})"
+                       + (f": {a.ultimo_error}" if a.ultimo_error else ""))

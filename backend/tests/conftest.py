@@ -13,6 +13,7 @@ from pathlib import Path
 
 import psycopg
 import pytest
+from flask import g
 from sqlalchemy.engine import make_url
 
 from app import create_app
@@ -49,10 +50,25 @@ def _preparar_base(url: str) -> None:
             conn.execute(archivo.read_text(encoding="utf-8"))
 
 
+def aislar_usuario_por_peticion(aplicacion) -> None:
+    """Las fixtures `db` dejan abierto un contexto de app durante toda la prueba, y Flask
+    reutiliza ese contexto (y su `g`) en cada petición del cliente de pruebas. Flask-Login
+    guarda el usuario en g._login_user: sin esto, la petición de un trabajador podía
+    heredar al propietario de la petición anterior y una prueba de permisos pasaría en
+    falso. En producción cada petición tiene su propio contexto y esto no ocurre."""
+
+    def _usuario_de_esta_peticion():
+        g.pop("_login_user", None)
+
+    # Primero que todos los before_request (incluido el que responde 401 en la API)
+    aplicacion.before_request_funcs.setdefault(None, []).insert(0, _usuario_de_esta_peticion)
+
+
 @pytest.fixture(scope="session")
 def app():
     _preparar_base(TestConfig.SQLALCHEMY_DATABASE_URI)
     aplicacion = create_app(TestConfig)
+    aislar_usuario_por_peticion(aplicacion)
     yield aplicacion
 
 

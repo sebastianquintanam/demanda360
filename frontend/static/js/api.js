@@ -17,6 +17,7 @@ const USE_MOCK = typeof window.USE_MOCK === "boolean"
 const MOCKS = {
   "GET /api/health": "health.json",
   "GET /api/productos": "productos.json",
+  "GET /api/catalogos": "catalogos.json",
   "GET /api/productos/1": "producto_detalle.json",
   "GET /api/dashboard": "dashboard.json",
   "GET /api/analisis/rotacion": "rotacion.json",

@@ -347,7 +347,8 @@ AS $$
     SELECT 3, 'KPI3', 'Baja rotación',
            CASE WHEN k3.den > 0 THEN round(k3.num * 100.0 / k3.den, 1) END, '%',
            k3.num, k3.den::integer,
-           format('%s de %s; %s referencia(s) con datos insuficientes', k3.num, k3.den, k3.insuficientes), 'menor'
+           format('%s de %s; %s %s con datos insuficientes', k3.num, k3.den, k3.insuficientes,
+                  CASE WHEN k3.insuficientes = 1 THEN 'referencia' ELSE 'referencias' END), 'menor'
     FROM k3
     UNION ALL
     SELECT 4, 'KPI4', 'Tiempo de confirmación del proveedor',
