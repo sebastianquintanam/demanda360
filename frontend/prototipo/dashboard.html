@@ -1,16 +1,25 @@
 <!doctype html>
 <html lang="es">
+<!--
+  PROTOTIPO (Rol 4) · Dashboard
+  Se abre con Live Server tomando la carpeta frontend/ como raíz y usa los mocks de static/mock/.
+  La LÓGICA no vive aquí: es static/js/comun.js + static/js/dashboard.js, los mismos archivos que usa
+  Flask en frontend/templates/dashboard.html. Un cambio de comportamiento se hace allí una sola vez.
+  Este archivo solo conserva el marco del prototipo (menú, «Ver como», aviso de mocks).
+-->
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
   <title>Dashboard · Pinturas By-plus</title>
   <link rel="stylesheet" href="../static/css/estilos.css">
-  <!-- Único estilo propio: la rejilla de las 3 tarjetas KPI (el resto sale de estilos.css) -->
   <style>
-    .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
-    .kpi-valor { font-size: 28px; font-weight: 700; margin: 8px 0 4px; }
-  </style>
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+  .kpi-valor { font-size: 28px; font-weight: 700; margin: 8px 0 4px; }
+</style>
+  <style>.aviso-mock { background: var(--simulado-fondo); color: var(--simulado-texto); }</style>
 </head>
+<!-- data-rol lo pone base.html en Flask. En el prototipo "" = vista de trabajador. -->
 <body data-rol="">
   <div class="layout">
     <aside class="sidebar">
@@ -28,6 +37,11 @@
       </nav>
       <div class="sidebar-pie">
         <div class="usuario">Prototipo (sin sesión)</div>
+        <label for="ver-como" style="color:#cbd5e1">Ver como (solo prototipo)</label>
+        <select id="ver-como">
+          <option value="">Trabajador</option>
+          <option value="propietario">Propietario</option>
+        </select>
       </div>
     </aside>
 
@@ -40,176 +54,49 @@
         <span class="etiqueta etiqueta-simulado" id="etiqueta-simulado" hidden>Datos simulados</span>
       </header>
 
-      <div class="alerta alerta-error" id="error" hidden></div>
+<div class="alerta alerta-error" id="error" role="alert" hidden></div>
 
-      <section aria-label="Indicadores">
-        <p class="nota" id="nota-kpis"></p>
-        <div class="kpis" id="kpis"></div>
-      </section>
+<section aria-label="Indicadores">
+  <p class="nota" id="nota-kpis"></p>
+  <div class="kpis" id="kpis"></div>
+</section>
 
-      <section class="tarjeta">
-        <h2>Productos críticos y agotados</h2>
-        <p class="nota">Saldo actual (existencia de hoy).</p>
-        <table class="tabla">
-          <thead>
-            <tr><th>SKU</th><th>Producto</th><th>Saldo</th><th>Umbral</th><th>Entrega (días)</th><th>Estado</th></tr>
-          </thead>
-          <tbody id="tabla-criticos"></tbody>
-        </table>
-      </section>
+<section class="tarjeta">
+  <h2>Productos críticos y agotados</h2>
+  <p class="nota">Saldo actual (existencia de hoy).</p>
+  <table class="tabla">
+    <thead>
+      <tr><th>SKU</th><th>Producto</th><th>Saldo</th><th>Umbral</th><th>Entrega (días)</th><th>Estado</th></tr>
+    </thead>
+    <tbody id="tabla-criticos"></tbody>
+  </table>
+</section>
 
-      <section class="tarjeta">
-        <h2>Inventario por producto</h2>
-        <p class="nota">Saldo actual (existencia de hoy).</p>
-        <table class="tabla">
-          <thead>
-            <tr><th>SKU</th><th>Producto</th><th>Saldo</th><th>Vendidas 30 d</th><th>No atendidas 30 d</th><th>Entrega (días)</th><th>Estado</th></tr>
-          </thead>
-          <tbody id="tabla-inventario"></tbody>
-        </table>
-      </section>
+<section class="tarjeta">
+  <h2>Inventario por producto</h2>
+  <p class="nota">Saldo de hoy. Vendidas y no atendidas: periodo de los indicadores (fecha de corte).</p>
+  <table class="tabla">
+    <thead>
+      <tr><th>SKU</th><th>Producto</th><th>Saldo</th><th>Vendidas (periodo)</th><th>No atendidas (periodo)</th><th>Entrega (días)</th><th>Estado</th></tr>
+    </thead>
+    <tbody id="tabla-inventario"></tbody>
+  </table>
+</section>
 
-      <p class="nota">El análisis detallado de demanda y rotación está en el tablero de Power BI.</p>
+<p class="nota">El análisis detallado de demanda y rotación está en el tablero de Power BI.</p>
     </main>
   </div>
 
-  <!-- Prototipo: fuerza los mocks de /static/mock (Live Server con la carpeta frontend/ como raíz) -->
   <script>window.USE_MOCK = true;</script>
   <script src="../static/js/api.js"></script>
+  <script src="../static/js/comun.js"></script>
   <script>
-    /* La pantalla solo MUESTRA lo que entrega la API: no calcula reglas de negocio.
-       Todo dato se inserta con textContent (nunca innerHTML). */
-
-    // Los 6 estados del plan → texto y clase de estilos.css
-    const ESTADOS = {
-      SIN_CONTEO:          { texto: "Sin conteo",          clase: "etiqueta-normal" },
-      AGOTADO:             { texto: "Agotado",             clase: "etiqueta-agotado" },
-      CRITICO:             { texto: "Crítico",             clase: "etiqueta-critico" },
-      DATOS_INSUFICIENTES: { texto: "Datos insuficientes", clase: "etiqueta-datos-insuficientes" },
-      BAJA_ROTACION:       { texto: "Baja rotación",       clase: "etiqueta-baja-rotacion" },
-      NORMAL:              { texto: "Normal",              clase: "etiqueta-normal" },
-    };
-
-    const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
-
-    // "2026-09-01" → { d: 1, m: "sep", a: 2026 } sin pasar por Date (evita desfase de zona horaria)
-    function partesFecha(iso) {
-      const [a, m, d] = String(iso).split("-").map(Number);
-      return { d, m: MESES[m - 1], a };
-    }
-
-    // { desde, hasta } → "1–30 sep 2026" (o "28 ago – 3 sep 2026" si cambia el mes)
-    function textoPeriodo(periodo) {
-      if (!periodo || !periodo.desde || !periodo.hasta) return "";
-      const i = partesFecha(periodo.desde), f = partesFecha(periodo.hasta);
-      if (i.a === f.a && i.m === f.m) return `${i.d}–${f.d} ${f.m} ${f.a}`;
-      if (i.a === f.a) return `${i.d} ${i.m} – ${f.d} ${f.m} ${f.a}`;
-      return `${i.d} ${i.m} ${i.a} – ${f.d} ${f.m} ${f.a}`;
-    }
-
-    const formatoValor = new Intl.NumberFormat("es-CO", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-
-    function el(etiqueta, clase, texto) {
-      const nodo = document.createElement(etiqueta);
-      if (clase) nodo.className = clase;
-      if (texto !== undefined && texto !== null) nodo.textContent = String(texto);
-      return nodo;
-    }
-
-    // Contrato de API: saldo null = el producto aún no tiene conteo. Nunca se muestra como 0.
-    function textoSaldo(saldo) {
-      return saldo === null || saldo === undefined ? "Sin conteo" : saldo;
-    }
-
-    function etiquetaEstado(codigo) {
-      const e = ESTADOS[codigo] || { texto: codigo || "—", clase: "etiqueta-normal" };
-      return el("span", "etiqueta " + e.clase, e.texto);
-    }
-
-    function fila(celdas, estado) {
-      const tr = document.createElement("tr");
-      celdas.forEach((valor) => tr.appendChild(el("td", null, valor)));
-      const td = document.createElement("td");
-      td.appendChild(etiquetaEstado(estado));
-      tr.appendChild(td);
-      return tr;
-    }
-
-    function filaVacia(tbody, columnas, mensaje) {
-      const tr = document.createElement("tr");
-      const td = el("td", "nota", mensaje);
-      td.colSpan = columnas;
-      tr.appendChild(td);
-      tbody.appendChild(tr);
-    }
-
-    function pintarKpis(kpis) {
-      const cont = document.getElementById("kpis");
-      cont.replaceChildren();
-      (kpis || []).forEach((k) => {
-        const tarjeta = el("article", "tarjeta");
-        tarjeta.appendChild(el("div", "subtitulo", k.nombre));
-        const valor = typeof k.valor === "number" ? formatoValor.format(k.valor) : "—";
-        tarjeta.appendChild(el("div", "kpi-valor", `${valor} ${k.unidad || ""}`.trim()));
-        if (k.detalle) tarjeta.appendChild(el("div", null, k.detalle));
-        if (k.meta) tarjeta.appendChild(el("div", "nota", "Meta: " + k.meta));
-        cont.appendChild(tarjeta);
-      });
-    }
-
-    function pintarCriticos(criticos) {
-      const tbody = document.getElementById("tabla-criticos");
-      tbody.replaceChildren();
-      if (!criticos || criticos.length === 0) return filaVacia(tbody, 6, "No hay productos críticos ni agotados.");
-      criticos.forEach((p) => tbody.appendChild(
-        fila([p.sku, p.nombre, textoSaldo(p.saldo), p.umbral_reposicion, p.plazo_entrega_dias], p.estado)
-      ));
-    }
-
-    function pintarInventario(inventario) {
-      const tbody = document.getElementById("tabla-inventario");
-      tbody.replaceChildren();
-      if (!inventario || inventario.length === 0) return filaVacia(tbody, 7, "No hay productos registrados.");
-      inventario.forEach((p) => tbody.appendChild(
-        fila([p.sku, p.nombre, textoSaldo(p.saldo), p.vendidas_30d, p.no_atendidas_30d, p.plazo_entrega_dias], p.estado)
-      ));
-    }
-
-    function mostrarError(mensaje) {
-      const caja = document.getElementById("error");
-      caja.textContent = mensaje || "No se pudo cargar el dashboard.";
-      caja.hidden = false;
-      document.getElementById("subtitulo").textContent = "Inventario y demanda";
-    }
-
-    async function cargarDashboard() {
-      let r;
-      try {
-        r = await apiGet("/api/dashboard");
-      } catch (e) {
-        return mostrarError("No se pudo leer la respuesta del servidor.");
-      }
-      if (!r.ok) return mostrarError(r.error && r.error.mensaje);
-
-      const d = r.data || {};
-      const partes = ["Inventario y demanda"];
-      if (Array.isArray(d.inventario)) partes.push(`${d.inventario.length} referencias`);
-      document.getElementById("subtitulo").textContent = partes.join(" · ");
-
-      // Los KPI son del periodo del corte; el saldo de las tablas es el actual
-      const periodo = textoPeriodo(d.periodo);
-      const notaKpis = [];
-      if (periodo) notaKpis.push("Indicadores del periodo " + periodo);
-      if (d.corte) { const c = partesFecha(d.corte); notaKpis.push(`fecha de corte: ${c.d} ${c.m} ${c.a}`); }
-      document.getElementById("nota-kpis").textContent = notaKpis.join(" · ");
-      document.getElementById("etiqueta-simulado").hidden = d.origen_datos !== "SIMULADO";
-
-      pintarKpis(d.kpis);
-      pintarCriticos(d.criticos);
-      pintarInventario(d.inventario);
-    }
-
-    cargarDashboard();
+    // «Ver como»: cambia el rol del prototipo y recarga la pantalla con ese rol
+    const verComo = document.getElementById("ver-como");
+    verComo.value = sessionStorage.getItem("prototipo-rol") || "";
+    document.body.dataset.rol = verComo.value;
+    verComo.addEventListener("change", () => { sessionStorage.setItem("prototipo-rol", verComo.value); location.reload(); });
   </script>
+  <script src="../static/js/dashboard.js"></script>
 </body>
 </html>

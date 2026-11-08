@@ -19,14 +19,7 @@ function aplicarRol() {
   actualizarTipoMovimiento();
 }
 
-// Solo existe en el prototipo: en Flask el rol sale de la sesión
-const selectorRol = document.getElementById("ver-como");
-if (selectorRol) {
-  selectorRol.addEventListener("change", (e) => {
-    document.body.dataset.rol = e.target.value;
-    aplicarRol();
-  });
-}
+// El rol viene de la sesión (Flask) o del selector «Ver como» del prototipo, antes de cargar este script.
 
 /* ---------- Lista de productos (GET /api/productos) ---------- */
 function pintarSaldo(select) {
@@ -474,4 +467,4 @@ if (avisoMock) avisoMock.hidden = !USE_MOCK;
 [formVenta, formConteo, formMov].forEach(renovarRef);
 aplicarRol();
 cargarProductos();
-if (esPropietario() || selectorRol) cargarCatalogos();
+if (esPropietario()) cargarCatalogos();

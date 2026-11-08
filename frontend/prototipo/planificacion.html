@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="es">
+<!--
+  PROTOTIPO (Rol 4) · Planificación de pedidos
+  Se abre con Live Server tomando la carpeta frontend/ como raíz y usa los mocks de static/mock/.
+  La LÓGICA no vive aquí: es static/js/comun.js + static/js/planificacion.js, los mismos archivos que usa
+  Flask en frontend/templates/planificacion.html. Un cambio de comportamiento se hace allí una sola vez.
+  Este archivo solo conserva el marco del prototipo (menú, «Ver como», aviso de mocks).
+-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Planificación de pedidos · Pinturas By-plus</title>
+  <link rel="stylesheet" href="../static/css/estilos.css">
+  <style>
+  .fila-cobertura { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .fila-cobertura input { width: 90px; }
+  .tabla input { width: 110px; }
+  .tabla td.sugerido { color: var(--color-texto-suave); }
+  .resumen { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 8px; }
+  .resumen .valor { font-size: 24px; font-weight: 700; }
+  .regla { background: var(--simulado-fondo); color: var(--simulado-texto); border-radius: 8px; padding: 12px; }
+  .regla ul { margin: 8px 0 0; padding-left: 18px; }
+  .acciones { display: flex; justify-content: flex-end; margin-top: 16px; }
+  .acciones-pedido { display: flex; gap: 6px; flex-wrap: wrap; }
+  .acciones-pedido .boton, form.cancelar .boton { padding: 6px 10px; font-size: 13px; }
+  form.cancelar { display: grid; gap: 6px; min-width: 220px; }
+  .boton-peligro { background: var(--agotado-texto); border-color: var(--agotado-texto); color: #fff; }
+  .etiqueta-confirmado { background: #dcfce7; color: #166534; }
+  .alerta-ok { background: #dcfce7; color: #166534; }
+  .campo-error { border-color: var(--agotado-texto) !important; }
+  section + section { margin-top: 16px; }
+</style>
+  <style>.aviso-mock { background: var(--simulado-fondo); color: var(--simulado-texto); }</style>
+</head>
+<!-- data-rol lo pone base.html en Flask. En el prototipo "" = vista de trabajador. -->
+<body data-rol="">
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="marca">
+        <div class="marca-icono" aria-hidden="true">◫</div>
+        <div>
+          <div class="marca-nombre">Demanda360</div>
+          <div class="marca-sub">Pinturas By-plus</div>
+        </div>
+      </div>
+      <nav class="menu">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="registro.html">Registro</a>
+        <a href="planificacion.html" class="activo">Planificación de pedidos</a>
+      </nav>
+      <div class="sidebar-pie">
+        <div class="usuario">Prototipo (sin sesión)</div>
+        <label for="ver-como" style="color:#cbd5e1">Ver como (solo prototipo)</label>
+        <select id="ver-como">
+          <option value="">Trabajador</option>
+          <option value="propietario">Propietario</option>
+        </select>
+      </div>
+    </aside>
+
+    <main class="contenido">
+      <header class="encabezado">
+        <div>
+          <h1>Planificación de pedidos</h1>
+          <p class="subtitulo" id="subtitulo">Cargando…</p>
+        </div>
+        <span class="etiqueta etiqueta-simulado" id="etiqueta-simulado" hidden>Datos simulados</span>
+      </header>
+
+      <div class="alerta aviso-mock" id="aviso-mock" hidden>
+        <strong>Modo prototipo: las respuestas son simuladas.</strong>
+        Los botones devuelven siempre el mismo ejemplo de <code>static/mock/</code> y nada se guarda.
+        Los errores 400, 403 y 409 solo aparecen con el backend real.
+      </div>
+
+
+<section class="tarjeta solo-propietario">
+  <h2>Cobertura total</h2>
+  <p class="nota">Días que debe cubrir el pedido. El plazo de entrega no se suma: indica cuándo revisar. Unidades = envases de la presentación.</p>
+  <div class="fila-cobertura">
+    <label for="cobertura">Cobertura total (días)</label>
+    <input id="cobertura" type="number" min="1" max="90" step="1" value="14" inputmode="numeric">
+    <button type="button" class="boton" id="recalcular">Recalcular</button>
+  </div>
+  <div class="alerta alerta-error" id="aviso-sugeridos" role="alert" hidden></div>
+</section>
+
+<section class="tarjeta solo-propietario">
+  <h2>Productos prioritarios</h2>
+  <p class="nota">Existencias de hoy. Demanda del periodo de los indicadores. Pasa el cursor sobre el sugerido para ver su cálculo.</p>
+  <table class="tabla">
+    <thead>
+      <tr><th>Producto</th><th>Existencias</th><th>Demanda u/día</th><th>Entrega</th><th>Sugerido</th><th>Cantidad a pedir</th></tr>
+    </thead>
+    <tbody id="tabla-sugeridos"></tbody>
+  </table>
+</section>
+
+<section class="tarjeta solo-propietario">
+  <h2>Regla de cálculo</h2>
+  <div class="regla">
+    <div id="regla"></div>
+    <ul id="formulas"></ul>
+  </div>
+</section>
+
+<section class="tarjeta solo-propietario">
+  <h2>Resumen</h2>
+  <div class="resumen">
+    <div><div class="nota">Referencias prioritarias</div><div class="valor" id="res-prioritarias">—</div></div>
+    <div><div class="nota">Total sugerido</div><div class="valor" id="res-total-sugerido">—</div></div>
+    <div><div class="nota">Total en borrador</div><div class="valor" id="res-total-borrador">—</div></div>
+  </div>
+  <p class="nota">Guardar solo crea borradores (uno por proveedor habitual): no compra ni modifica el inventario. Cada borrador necesita tu aprobación.</p>
+  <div class="alerta" id="aviso-borrador" role="status" hidden></div>
+  <div class="acciones"><button type="button" class="boton boton-primario" id="guardar-borrador">Guardar borrador</button></div>
+</section>
+
+
+<section class="tarjeta">
+  <h2>Pedidos</h2>
+  <p class="nota">Confirmar un pedido no suma inventario: la mercancía entra cuando llega (Registro → Entrada). «Esperando respuesta» son horas desde el envío, no el plazo de entrega.</p>
+  <div class="alerta" id="aviso-pedidos" role="status" hidden></div>
+  <table class="tabla">
+    <thead>
+      <tr><th>N.º</th><th>Proveedor</th><th>Estado</th><th>Productos</th><th>Fechas</th><th></th></tr>
+    </thead>
+    <tbody id="tabla-pedidos"></tbody>
+  </table>
+</section>
+    </main>
+  </div>
+
+  <script>window.USE_MOCK = true;</script>
+  <script src="../static/js/api.js"></script>
+  <script src="../static/js/comun.js"></script>
+  <script>
+    // «Ver como»: cambia el rol del prototipo y recarga la pantalla con ese rol
+    const verComo = document.getElementById("ver-como");
+    verComo.value = sessionStorage.getItem("prototipo-rol") || "";
+    document.body.dataset.rol = verComo.value;
+    verComo.addEventListener("change", () => { sessionStorage.setItem("prototipo-rol", verComo.value); location.reload(); });
+  </script>
+  <script src="../static/js/planificacion.js"></script>
+</body>
+</html>

@@ -16,7 +16,9 @@
       "plazo_entrega_dias": 3,
       "sugerido": 24,
       "formula": "techo((45 + 6) / 30 × 14 − 0) = 24",
-      "regla_version": 1
+      "regla_version": 1,
+      "proveedor_id": 1,
+      "proveedor": "Suministros Andinos (ficticio)"
     },
     {
       "id": 2,
@@ -28,7 +30,9 @@
       "plazo_entrega_dias": 4,
       "sugerido": 10,
       "formula": "techo((18 + 3) / 30 × 14 − 0) = 10",
-      "regla_version": 1
+      "regla_version": 1,
+      "proveedor_id": 2,
+      "proveedor": "Distribuidora Cordillera (ficticio)"
     },
     {
       "id": 3,
@@ -40,7 +44,9 @@
       "plazo_entrega_dias": 3,
       "sugerido": 13,
       "formula": "techo((24 + 2) / 30 × 14 − 0) = 13",
-      "regla_version": 1
+      "regla_version": 1,
+      "proveedor_id": 1,
+      "proveedor": "Suministros Andinos (ficticio)"
     },
     {
       "id": 4,
@@ -52,7 +58,9 @@
       "plazo_entrega_dias": 5,
       "sugerido": 5,
       "formula": "techo((20 + 1) / 30 × 14 − 5) = 5",
-      "regla_version": 1
+      "regla_version": 1,
+      "proveedor_id": 3,
+      "proveedor": "Químicos La Sabana (ficticio)"
     },
     {
       "id": 5,
@@ -64,7 +72,9 @@
       "plazo_entrega_dias": 5,
       "sugerido": 2,
       "formula": "techo((12 + 0) / 30 × 14 − 4) = 2",
-      "regla_version": 1
+      "regla_version": 1,
+      "proveedor_id": 3,
+      "proveedor": "Químicos La Sabana (ficticio)"
     },
     {
       "id": 6,
@@ -76,7 +86,9 @@
       "plazo_entrega_dias": 4,
       "sugerido": null,
       "formula": "Datos insuficientes (3 días de registros desde 28 sep): cantidad manual del propietario",
-      "regla_version": 1
+      "regla_version": 1,
+      "proveedor_id": 2,
+      "proveedor": "Distribuidora Cordillera (ficticio)"
     },
     {
       "id": 7,
@@ -88,7 +100,9 @@
       "plazo_entrega_dias": 7,
       "sugerido": 0,
       "formula": "máx(0, techo((2 + 0) / 30 × 14 − 15)) = 0",
-      "regla_version": 1
+      "regla_version": 1,
+      "proveedor_id": 4,
+      "proveedor": "Pinturas del Llano (ficticio)"
     },
     {
       "id": 8,
@@ -100,7 +114,9 @@
       "plazo_entrega_dias": 5,
       "sugerido": 0,
       "formula": "máx(0, techo((1 + 0) / 30 × 14 − 12)) = 0",
-      "regla_version": 1
+      "regla_version": 1,
+      "proveedor_id": 3,
+      "proveedor": "Químicos La Sabana (ficticio)"
     },
     {
       "id": 9,
@@ -112,7 +128,9 @@
       "plazo_entrega_dias": 4,
       "sugerido": 0,
       "formula": "máx(0, techo((1 + 0) / 30 × 14 − 9)) = 0",
-      "regla_version": 1
+      "regla_version": 1,
+      "proveedor_id": 2,
+      "proveedor": "Distribuidora Cordillera (ficticio)"
     },
     {
       "id": 10,
@@ -124,7 +142,9 @@
       "plazo_entrega_dias": 3,
       "sugerido": 0,
       "formula": "máx(0, techo((0 + 0) / 30 × 14 − 10)) = 0",
-      "regla_version": 1
+      "regla_version": 1,
+      "proveedor_id": 1,
+      "proveedor": "Suministros Andinos (ficticio)"
     },
     {
       "id": 11,
@@ -136,7 +156,9 @@
       "plazo_entrega_dias": 5,
       "sugerido": 0,
       "formula": "máx(0, techo((2 + 0) / 30 × 14 − 11)) = 0",
-      "regla_version": 1
+      "regla_version": 1,
+      "proveedor_id": 3,
+      "proveedor": "Químicos La Sabana (ficticio)"
     }
   ]
 }

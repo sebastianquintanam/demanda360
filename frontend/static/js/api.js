@@ -29,6 +29,8 @@ const MOCKS = {
   "POST /api/ventas": "venta_creada.json",
   "POST /api/movimientos": "movimiento_creado.json",
   "POST /api/pedidos": "pedido_creado.json",
+  "POST /api/pedidos/6/aprobar": "pedido_actualizado.json",
+  "POST /api/pedidos/7/estado": "pedido_actualizado.json",
 };
 
 function csrfToken() {
