@@ -10,7 +10,10 @@
 | `GET /api/health` | P0 | Implementada (etapa 1) |
 | `GET /api/auditoria` | P0 | Implementada (etapa 1) |
 | Cálculos en SQL: saldo, estado, KPI 1–5, sugeridos (`02_vistas.sql`) | P0/P1 | Implementados (etapa 2) |
-| Productos, conteos, ventas, movimientos, dashboard, rotación | P0 | Etapa 3 |
+| `GET/POST /api/productos`, `GET /api/productos/{id}`, `GET /api/catalogos` | P0 | Implementadas (etapa 3) |
+| `POST /api/conteos`, `POST /api/ventas`, `POST /api/movimientos` | P0 | Implementadas (etapa 3) |
+| `GET /api/dashboard`, `GET /api/analisis/rotacion` | P0 | Implementadas (etapa 3) |
+| Alerta a n8n + `flask reintentar-alertas` | P0 | Implementada (etapa 3) |
 | Sugeridos y pedidos | P1 | Etapa 5 |
 
 ## Precisiones de la etapa 1 (no cambian el plan)
@@ -21,6 +24,33 @@
 - **405** responde `METODO_NO_PERMITIDO` con el mismo formato.
 - **CSRF inválido o ausente** en un `POST /api/*`: `400 VALIDACION` con `campos: {"csrf": "invalido"}`.
 - **Sesión y rol en pantallas:** `base.html` deja el rol en `<body data-rol="...">`. Los elementos con clase `solo-propietario` se ocultan al trabajador (solo comodidad visual: el backend igual responde 403).
+
+## Precisiones de la etapa 3 (no cambian el plan)
+
+- **Respuestas = mocks.** Cada ruta devuelve al menos los campos de su archivo en `frontend/static/mock/`; las pruebas lo verifican. Con los datos demo, `/api/productos`, `/api/analisis/rotacion` y los críticos e inventario de `/api/dashboard` son **idénticos** a sus mocks.
+- **Saldo y estado son los de hoy; los KPI son los del corte.** `GET /api/dashboard` y `/api/analisis/rotacion` aceptan `?corte=AAAA-MM-DD` (400 si el formato es inválido o la fecha es futura).
+- **Un producto contado después del corte** queda en `DATOS_INSUFICIENTES` (menos de 30 días de registros), salvo que esté agotado o crítico.
+- **Bloque `producto`** en las respuestas de conteo, venta y movimiento: `id`, `sku`, `saldo_anterior`, `saldo_actual`, `umbral_reposicion`, `estado`.
+- **Reenvío del mismo formulario** (mismo `origen_ref`): `200` con lo que ya existe y `"duplicado": true`. Nada se registra dos veces.
+- **Errores nuevos:**
+  - `409 SIN_CONTEO`: entrada, ajuste o venta con entrega sobre un producto que nunca se ha contado. Una atención con `cantidad_entregada = 0` sí se registra sin conteo, porque la demanda no atendida cuenta igual.
+  - `409 ORIGEN_REF_EN_USO`: ese `origen_ref` ya se usó en otro tipo de registro.
+- **Ajustes:** solo el propietario (403 para el trabajador), cantidad ≠ 0 con signo, justificación de 10 a 500 caracteres y nunca un saldo negativo (409 `STOCK_INSUFICIENTE`).
+- **`GET /api/catalogos`** (ambos roles): `categorias`, `proveedores` (con `plazo_entrega_dias`) y `unidades_medida`, para los formularios de Registro. Mock: `catalogos.json`.
+- **Cliente que regresa:** `GET /api/productos/{id}` trae `faltantes_pendientes` (atenciones de los últimos 30 días con faltante sin cubrir). La pantalla deja escoger una y envía su `solicitud_id` como `solicitud_previa_id` en `POST /api/ventas`. Reglas: misma referencia, enlazada a la atención original (no a otro regreso) y `cantidad_solicitada` ≤ faltante pendiente; si no, 400.
+- **Sin sesión:** un `POST /api/*` sin sesión responde 401 antes que el chequeo de CSRF, así una sesión vencida lleva al login.
+
+## Alerta de stock crítico · contrato con n8n (cerrado el 8 nov 2026)
+
+| Paso | Qué pasa |
+| --- | --- |
+| 1 | Una venta hace cruzar el umbral (saldo antes > umbral ≥ saldo después). En la misma transacción se crea la fila `alertas_enviadas` en `PENDIENTE`. |
+| 2 | Después del commit, Flask hace `POST` a `N8N_WEBHOOK_URL` con la cabecera `X-Demanda360-Token` y el evento de la sección 5 del plan (`evento_id`, `tipo`, `ocurrido_en`, `origen_datos`, `producto{sku, nombre, saldo, umbral, plazo_entrega_dias}`). Espera **10 s** como máximo (Gmail tarda ~2,5 s). |
+| 3 | n8n responde **200 `{"ok": true, ...}` solo después de enviar el correo**; **502 `{"ok": false, "error": "..."}`** si falla el envío; 403 si el token no sirve. |
+| 4 | Flask marca `ENVIADA` solo con 200 y `ok: true`. Cualquier otra cosa (502, 403, timeout, n8n apagado) → `FALLIDA`, `intentos + 1` y el motivo en `ultimo_error`. La venta nunca se deshace. |
+| 5 | `flask reintentar-alertas` reenvía las `FALLIDA` (y las `PENDIENTE` de más de un minuto) con el **mismo `evento_id`**, máximo 3 intentos. Una `ENVIADA` nunca se reenvía. |
+
+El estado vive **solo en PostgreSQL**. n8n no guarda ni descarta duplicados, porque preferimos un correo repetido a una alerta perdida. El correo incluye el `evento_id` para reconocer un repetido.
 
 ## Decisiones aprobadas (8 nov 2026)
 
