@@ -60,6 +60,25 @@ flask --app run crear-usuarios-demo
 flask --app run run --debug --port 8000       # recarga al guardar
 ```
 
+## Datos demo y KPI
+
+Todo el historial es **SIMULADO**: 30 días de septiembre de 2026 con las 11 referencias del Figma (127 vendidas, 12 no atendidas, 5 pedidos). Con esos datos los KPI dan 27,3 %, 8,6 % y 50 %, y el sugerido total es 54; `backend/tests/test_kpi_demo.py` lo exige.
+
+```bash
+# En una base sin productos y con los usuarios demo ya creados:
+docker compose exec web flask cargar-demo        # aplica 02_vistas.sql, carga 10_demo.sql y muestra los KPI
+
+# Si cambia 02_vistas.sql (no borra datos):
+docker compose exec web flask aplicar-vistas
+
+# CSV para Power BI (quedan en analytics/datos_demo/):
+./analytics/exportar_csv.sh
+```
+
+- **Fecha de corte:** los KPI se calculan sobre el 1–30 de septiembre (`fn_corte()` = 2026-09-30). El saldo en pantalla es el de hoy, así que una venta en vivo cambia el saldo y el estado sin mover los KPI de septiembre. Otro corte: `CORTE=2026-10-31 ./analytics/exportar_csv.sh`.
+- **Los datos demo no se editan a mano:** se cambia `database/seeds/generar_demo.py` y se regenera `10_demo.sql` con `python3 database/seeds/generar_demo.py`.
+- **Volver a cargar desde cero** exige base vacía: `docker compose down -v` borra también n8n (exporta antes tu flujo).
+
 ## Pruebas
 
 Corren contra un PostgreSQL real (crean y recargan solas la base `demanda360_test`):

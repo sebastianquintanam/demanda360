@@ -1,0 +1,12 @@
+﻿corte,producto_id,sku,nombre,categoria,proveedor,plazo_entrega_dias,presentacion,unidad_medida,umbral_reposicion,saldo,estado,dias_con_registro,vendidas_30d,no_atendidas_30d,demanda_30d,demanda_diaria,cobertura_dias,cobertura_menor_que_plazo,sugerido_14d,origen_datos
+2026-09-30,1,LAC-BP-01,Laca catalizada alto brillo galón,Lacas,Suministros Andinos (ficticio),3,Galón,galon,6,0,AGOTADO,30,45,6,51,1.70,0,SI,24,SIMULADO
+2026-09-30,2,LAC-BP-02,Laca catalizada mate galón,Lacas,Distribuidora Cordillera (ficticio),4,Galón,galon,4,0,AGOTADO,30,18,3,21,0.70,0,SI,10,SIMULADO
+2026-09-30,3,ESM-WH-01,Esmalte blanco galón,Esmaltes,Suministros Andinos (ficticio),3,Galón,galon,4,0,AGOTADO,30,24,2,26,0.87,0,SI,13,SIMULADO
+2026-09-30,4,SEL-AQ-01,Sellador acuático galón,Selladores,Químicos La Sabana (ficticio),5,Galón,galon,6,5,CRITICO,30,20,1,21,0.70,7,NO,5,SIMULADO
+2026-09-30,5,SEL-CA-01,Sellador catalizado 45 % galón,Selladores,Químicos La Sabana (ficticio),5,Galón,galon,4,4,CRITICO,30,12,0,12,0.40,10,NO,2,SIMULADO
+2026-09-30,6,LAC-TR-01,Laca transparente galón,Lacas,Distribuidora Cordillera (ficticio),4,Galón,galon,3,8,DATOS_INSUFICIENTES,3,2,0,2,,,NO,,SIMULADO
+2026-09-30,7,ESM-SI-01,Esmalte sintético cuñete,Esmaltes,Pinturas del Llano (ficticio),7,Cuñete,cunete,2,15,BAJA_ROTACION,30,2,0,2,0.07,225,NO,0,SIMULADO
+2026-09-30,8,SEL-AC-01,Sellador acrílico galón,Selladores,Químicos La Sabana (ficticio),5,Galón,galon,3,12,BAJA_ROTACION,30,1,0,1,0.03,360,NO,0,SIMULADO
+2026-09-30,9,LAC-NG-01,Laca nogal galón,Lacas,Distribuidora Cordillera (ficticio),4,Galón,galon,3,9,BAJA_ROTACION,30,1,0,1,0.03,270,NO,0,SIMULADO
+2026-09-30,10,ESM-RJ-01,Esmalte rojo galón,Esmaltes,Suministros Andinos (ficticio),3,Galón,galon,3,10,BAJA_ROTACION,30,0,0,0,0.00,,NO,0,SIMULADO
+2026-09-30,11,SEL-MU-01,Sellador para muros cuñete,Selladores,Químicos La Sabana (ficticio),5,Cuñete,cunete,3,11,BAJA_ROTACION,30,2,0,2,0.07,165,NO,0,SIMULADO
