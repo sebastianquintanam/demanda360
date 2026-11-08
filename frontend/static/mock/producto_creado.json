@@ -1,0 +1,17 @@
+{
+  "id": 12,
+  "sku": "LAC-BP-03",
+  "nombre": "Laca catalizada alto brillo medio galón",
+  "categoria_id": 1,
+  "proveedor_id": 1,
+  "marca": "ColorNova (ficticia)",
+  "presentacion": "Medio galón",
+  "unidad_medida": "medio_galon",
+  "costo_compra": 46000,
+  "precio_venta": 60000,
+  "umbral_reposicion": 3,
+  "activo": true,
+  "creado_en": "2026-11-08T09:12:44-05:00",
+  "saldo": null,
+  "estado": "SIN_CONTEO"
+}

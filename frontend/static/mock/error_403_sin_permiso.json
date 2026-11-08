@@ -1,0 +1,7 @@
+{
+  "error": {
+    "codigo": "SIN_PERMISO",
+    "mensaje": "Solo un propietario puede aprobar pedidos.",
+    "campos": {}
+  }
+}

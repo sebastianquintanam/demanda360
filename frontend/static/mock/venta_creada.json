@@ -1,0 +1,17 @@
+{
+  "solicitud_id": 140,
+  "movimiento_id": 512,
+  "no_atendida": 1,
+  "producto": {
+    "id": 3,
+    "sku": "ESM-WH-01",
+    "saldo_anterior": 6,
+    "saldo_actual": 4,
+    "umbral_reposicion": 4,
+    "estado": "CRITICO"
+  },
+  "alerta": {
+    "evento_id": "5b0e8c1d-7f2a-4e3b-9c6d-0a1b2c3d4e5f",
+    "estado": "ENVIADA"
+  }
+}

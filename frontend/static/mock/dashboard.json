@@ -1,0 +1,202 @@
+{
+  "corte": "2026-09-30",
+  "periodo": {
+    "desde": "2026-09-01",
+    "hasta": "2026-09-30"
+  },
+  "origen_datos": "SIMULADO",
+  "kpis": [
+    {
+      "codigo": "KPI1",
+      "nombre": "Referencias agotadas",
+      "valor": 27.3,
+      "unidad": "%",
+      "numerador": 3,
+      "denominador": 11,
+      "detalle": "3 de 11 referencias",
+      "meta": "−20 % vs. línea base",
+      "variacion": null
+    },
+    {
+      "codigo": "KPI2",
+      "nombre": "Demanda no atendida",
+      "valor": 8.6,
+      "unidad": "%",
+      "numerador": 12,
+      "denominador": 139,
+      "detalle": "12 de 139 unidades solicitadas",
+      "meta": "−20 % vs. línea base",
+      "variacion": null
+    },
+    {
+      "codigo": "KPI3",
+      "nombre": "Baja rotación",
+      "valor": 50.0,
+      "unidad": "%",
+      "numerador": 5,
+      "denominador": 10,
+      "detalle": "5 de 10; 1 referencia con datos insuficientes",
+      "meta": "−10 % vs. línea base",
+      "variacion": null
+    }
+  ],
+  "criticos": [
+    {
+      "id": 1,
+      "sku": "LAC-BP-01",
+      "nombre": "Laca catalizada alto brillo galón",
+      "saldo": 0,
+      "umbral_reposicion": 6,
+      "estado": "AGOTADO",
+      "plazo_entrega_dias": 3
+    },
+    {
+      "id": 2,
+      "sku": "LAC-BP-02",
+      "nombre": "Laca catalizada mate galón",
+      "saldo": 0,
+      "umbral_reposicion": 4,
+      "estado": "AGOTADO",
+      "plazo_entrega_dias": 4
+    },
+    {
+      "id": 3,
+      "sku": "ESM-WH-01",
+      "nombre": "Esmalte blanco galón",
+      "saldo": 0,
+      "umbral_reposicion": 4,
+      "estado": "AGOTADO",
+      "plazo_entrega_dias": 3
+    },
+    {
+      "id": 4,
+      "sku": "SEL-AQ-01",
+      "nombre": "Sellador acuático galón",
+      "saldo": 5,
+      "umbral_reposicion": 6,
+      "estado": "CRITICO",
+      "plazo_entrega_dias": 5
+    },
+    {
+      "id": 5,
+      "sku": "SEL-CA-01",
+      "nombre": "Sellador catalizado 45 % galón",
+      "saldo": 4,
+      "umbral_reposicion": 4,
+      "estado": "CRITICO",
+      "plazo_entrega_dias": 5
+    }
+  ],
+  "inventario": [
+    {
+      "id": 1,
+      "sku": "LAC-BP-01",
+      "nombre": "Laca catalizada alto brillo galón",
+      "saldo": 0,
+      "vendidas_30d": 45,
+      "no_atendidas_30d": 6,
+      "plazo_entrega_dias": 3,
+      "estado": "AGOTADO"
+    },
+    {
+      "id": 2,
+      "sku": "LAC-BP-02",
+      "nombre": "Laca catalizada mate galón",
+      "saldo": 0,
+      "vendidas_30d": 18,
+      "no_atendidas_30d": 3,
+      "plazo_entrega_dias": 4,
+      "estado": "AGOTADO"
+    },
+    {
+      "id": 3,
+      "sku": "ESM-WH-01",
+      "nombre": "Esmalte blanco galón",
+      "saldo": 0,
+      "vendidas_30d": 24,
+      "no_atendidas_30d": 2,
+      "plazo_entrega_dias": 3,
+      "estado": "AGOTADO"
+    },
+    {
+      "id": 4,
+      "sku": "SEL-AQ-01",
+      "nombre": "Sellador acuático galón",
+      "saldo": 5,
+      "vendidas_30d": 20,
+      "no_atendidas_30d": 1,
+      "plazo_entrega_dias": 5,
+      "estado": "CRITICO"
+    },
+    {
+      "id": 5,
+      "sku": "SEL-CA-01",
+      "nombre": "Sellador catalizado 45 % galón",
+      "saldo": 4,
+      "vendidas_30d": 12,
+      "no_atendidas_30d": 0,
+      "plazo_entrega_dias": 5,
+      "estado": "CRITICO"
+    },
+    {
+      "id": 6,
+      "sku": "LAC-TR-01",
+      "nombre": "Laca transparente galón",
+      "saldo": 8,
+      "vendidas_30d": 2,
+      "no_atendidas_30d": 0,
+      "plazo_entrega_dias": 4,
+      "estado": "DATOS_INSUFICIENTES"
+    },
+    {
+      "id": 7,
+      "sku": "ESM-SI-01",
+      "nombre": "Esmalte sintético cuñete",
+      "saldo": 15,
+      "vendidas_30d": 2,
+      "no_atendidas_30d": 0,
+      "plazo_entrega_dias": 7,
+      "estado": "BAJA_ROTACION"
+    },
+    {
+      "id": 8,
+      "sku": "SEL-AC-01",
+      "nombre": "Sellador acrílico galón",
+      "saldo": 12,
+      "vendidas_30d": 1,
+      "no_atendidas_30d": 0,
+      "plazo_entrega_dias": 5,
+      "estado": "BAJA_ROTACION"
+    },
+    {
+      "id": 9,
+      "sku": "LAC-NG-01",
+      "nombre": "Laca nogal galón",
+      "saldo": 9,
+      "vendidas_30d": 1,
+      "no_atendidas_30d": 0,
+      "plazo_entrega_dias": 4,
+      "estado": "BAJA_ROTACION"
+    },
+    {
+      "id": 10,
+      "sku": "ESM-RJ-01",
+      "nombre": "Esmalte rojo galón",
+      "saldo": 10,
+      "vendidas_30d": 0,
+      "no_atendidas_30d": 0,
+      "plazo_entrega_dias": 3,
+      "estado": "BAJA_ROTACION"
+    },
+    {
+      "id": 11,
+      "sku": "SEL-MU-01",
+      "nombre": "Sellador para muros cuñete",
+      "saldo": 11,
+      "vendidas_30d": 2,
+      "no_atendidas_30d": 0,
+      "plazo_entrega_dias": 5,
+      "estado": "BAJA_ROTACION"
+    }
+  ]
+}

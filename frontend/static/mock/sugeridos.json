@@ -1,0 +1,142 @@
+{
+  "corte": "2026-09-30",
+  "origen_datos": "SIMULADO",
+  "cobertura_dias": 14,
+  "regla": "Sugerido = máx(0, techo(demanda diaria × cobertura − saldo)); demanda diaria = (vendidas + no atendidas en 30 días) / 30. El propietario aprueba.",
+  "referencias_prioritarias": 5,
+  "total_sugerido": 54,
+  "productos": [
+    {
+      "id": 1,
+      "sku": "LAC-BP-01",
+      "nombre": "Laca catalizada alto brillo galón",
+      "saldo": 0,
+      "demanda_diaria": 1.7,
+      "cobertura_dias": 14,
+      "plazo_entrega_dias": 3,
+      "sugerido": 24,
+      "formula": "techo((45 + 6) / 30 × 14 − 0) = 24",
+      "regla_version": 1
+    },
+    {
+      "id": 2,
+      "sku": "LAC-BP-02",
+      "nombre": "Laca catalizada mate galón",
+      "saldo": 0,
+      "demanda_diaria": 0.7,
+      "cobertura_dias": 14,
+      "plazo_entrega_dias": 4,
+      "sugerido": 10,
+      "formula": "techo((18 + 3) / 30 × 14 − 0) = 10",
+      "regla_version": 1
+    },
+    {
+      "id": 3,
+      "sku": "ESM-WH-01",
+      "nombre": "Esmalte blanco galón",
+      "saldo": 0,
+      "demanda_diaria": 0.87,
+      "cobertura_dias": 14,
+      "plazo_entrega_dias": 3,
+      "sugerido": 13,
+      "formula": "techo((24 + 2) / 30 × 14 − 0) = 13",
+      "regla_version": 1
+    },
+    {
+      "id": 4,
+      "sku": "SEL-AQ-01",
+      "nombre": "Sellador acuático galón",
+      "saldo": 5,
+      "demanda_diaria": 0.7,
+      "cobertura_dias": 14,
+      "plazo_entrega_dias": 5,
+      "sugerido": 5,
+      "formula": "techo((20 + 1) / 30 × 14 − 5) = 5",
+      "regla_version": 1
+    },
+    {
+      "id": 5,
+      "sku": "SEL-CA-01",
+      "nombre": "Sellador catalizado 45 % galón",
+      "saldo": 4,
+      "demanda_diaria": 0.4,
+      "cobertura_dias": 14,
+      "plazo_entrega_dias": 5,
+      "sugerido": 2,
+      "formula": "techo((12 + 0) / 30 × 14 − 4) = 2",
+      "regla_version": 1
+    },
+    {
+      "id": 6,
+      "sku": "LAC-TR-01",
+      "nombre": "Laca transparente galón",
+      "saldo": 8,
+      "demanda_diaria": null,
+      "cobertura_dias": 14,
+      "plazo_entrega_dias": 4,
+      "sugerido": null,
+      "formula": "Datos insuficientes (3 días de registros desde 28 sep): cantidad manual del propietario",
+      "regla_version": 1
+    },
+    {
+      "id": 7,
+      "sku": "ESM-SI-01",
+      "nombre": "Esmalte sintético cuñete",
+      "saldo": 15,
+      "demanda_diaria": 0.07,
+      "cobertura_dias": 14,
+      "plazo_entrega_dias": 7,
+      "sugerido": 0,
+      "formula": "máx(0, techo((2 + 0) / 30 × 14 − 15)) = 0",
+      "regla_version": 1
+    },
+    {
+      "id": 8,
+      "sku": "SEL-AC-01",
+      "nombre": "Sellador acrílico galón",
+      "saldo": 12,
+      "demanda_diaria": 0.03,
+      "cobertura_dias": 14,
+      "plazo_entrega_dias": 5,
+      "sugerido": 0,
+      "formula": "máx(0, techo((1 + 0) / 30 × 14 − 12)) = 0",
+      "regla_version": 1
+    },
+    {
+      "id": 9,
+      "sku": "LAC-NG-01",
+      "nombre": "Laca nogal galón",
+      "saldo": 9,
+      "demanda_diaria": 0.03,
+      "cobertura_dias": 14,
+      "plazo_entrega_dias": 4,
+      "sugerido": 0,
+      "formula": "máx(0, techo((1 + 0) / 30 × 14 − 9)) = 0",
+      "regla_version": 1
+    },
+    {
+      "id": 10,
+      "sku": "ESM-RJ-01",
+      "nombre": "Esmalte rojo galón",
+      "saldo": 10,
+      "demanda_diaria": 0.0,
+      "cobertura_dias": 14,
+      "plazo_entrega_dias": 3,
+      "sugerido": 0,
+      "formula": "máx(0, techo((0 + 0) / 30 × 14 − 10)) = 0",
+      "regla_version": 1
+    },
+    {
+      "id": 11,
+      "sku": "SEL-MU-01",
+      "nombre": "Sellador para muros cuñete",
+      "saldo": 11,
+      "demanda_diaria": 0.07,
+      "cobertura_dias": 14,
+      "plazo_entrega_dias": 5,
+      "sugerido": 0,
+      "formula": "máx(0, techo((2 + 0) / 30 × 14 − 11)) = 0",
+      "regla_version": 1
+    }
+  ]
+}

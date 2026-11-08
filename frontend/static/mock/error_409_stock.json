@@ -1,0 +1,9 @@
+{
+  "error": {
+    "codigo": "STOCK_INSUFICIENTE",
+    "mensaje": "Saldo disponible: 2. No se puede entregar 3.",
+    "campos": {
+      "cantidad_entregada": "supera_saldo"
+    }
+  }
+}

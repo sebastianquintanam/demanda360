@@ -1,0 +1,47 @@
+{
+  "origen_datos": "SIMULADO",
+  "producto": {
+    "id": 1,
+    "sku": "LAC-BP-01",
+    "nombre": "Laca catalizada alto brillo galón",
+    "categoria": "Lacas",
+    "proveedor": "Suministros Andinos (ficticio)",
+    "plazo_entrega_dias": 3,
+    "presentacion": "Galón",
+    "unidad_medida": "galon",
+    "umbral_reposicion": 6,
+    "saldo": 0,
+    "estado": "AGOTADO"
+  },
+  "ultimos_movimientos": [
+    {
+      "id": 512,
+      "tipo": "VENTA",
+      "cantidad": 2,
+      "fecha_hora": "2026-09-30T17:10:00-05:00",
+      "usuario": "trabajador",
+      "justificacion": null
+    },
+    {
+      "id": 509,
+      "tipo": "VENTA",
+      "cantidad": 1,
+      "fecha_hora": "2026-09-29T11:42:00-05:00",
+      "usuario": "trabajador",
+      "justificacion": null
+    },
+    {
+      "id": 503,
+      "tipo": "VENTA",
+      "cantidad": 2,
+      "fecha_hora": "2026-09-28T15:05:00-05:00",
+      "usuario": "trabajador",
+      "justificacion": null
+    }
+  ],
+  "ultimo_conteo": {
+    "cantidad_contada": 0,
+    "fecha_hora": "2026-09-30T19:00:00-05:00",
+    "usuario": "propietario"
+  }
+}

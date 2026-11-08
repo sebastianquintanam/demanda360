@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>{% block titulo %}Demanda360{% endblock %} · Pinturas By-plus</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body data-rol="{{ current_user.rol if current_user.is_authenticated else '' }}">
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="marca">
+        <div class="marca-icono" aria-hidden="true">◫</div>
+        <div>
+          <div class="marca-nombre">Demanda360</div>
+          <div class="marca-sub">Pinturas By-plus</div>
+        </div>
+      </div>
+      <nav class="menu">
+        <a href="{{ url_for('vistas.dashboard') }}" class="{{ 'activo' if activo == 'dashboard' }}">Dashboard</a>
+        <a href="{{ url_for('vistas.registro') }}" class="{{ 'activo' if activo == 'registro' }}">Registro</a>
+        <a href="{{ url_for('vistas.planificacion') }}" class="{{ 'activo' if activo == 'planificacion' }}">Planificación de pedidos</a>
+      </nav>
+      <div class="sidebar-pie">
+        <div class="usuario">{{ current_user.nombre }} · {{ current_user.rol }}</div>
+        <form method="post" action="{{ url_for('auth.logout') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="boton-link">Cerrar sesión</button>
+        </form>
+      </div>
+    </aside>
+    <main class="contenido">
+      <header class="encabezado">
+        <div>
+          <h1>{% block encabezado %}{% endblock %}</h1>
+          <p class="subtitulo">{% block subtitulo %}{% endblock %}</p>
+        </div>
+        {% if origen_datos == 'SIMULADO' %}<span class="etiqueta etiqueta-simulado">Datos simulados</span>{% endif %}
+      </header>
+      {% block contenido %}{% endblock %}
+    </main>
+  </div>
+  <script src="{{ url_for('static', filename='js/api.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

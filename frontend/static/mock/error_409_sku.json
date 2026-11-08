@@ -1,0 +1,9 @@
+{
+  "error": {
+    "codigo": "SKU_DUPLICADO",
+    "mensaje": "Ya existe un producto con el SKU LAC-BP-01.",
+    "campos": {
+      "sku": "duplicado"
+    }
+  }
+}

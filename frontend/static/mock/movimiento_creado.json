@@ -1,0 +1,15 @@
+{
+  "id": 513,
+  "producto_id": 1,
+  "tipo": "ENTRADA",
+  "cantidad": 24,
+  "fecha_hora": "2026-11-08T16:00:00-05:00",
+  "justificacion": null,
+  "producto": {
+    "id": 1,
+    "sku": "LAC-BP-01",
+    "saldo_anterior": 0,
+    "saldo_actual": 24,
+    "estado": "NORMAL"
+  }
+}

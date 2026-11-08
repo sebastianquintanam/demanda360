@@ -1,0 +1,22 @@
+# Quién revisa cada carpeta. Reemplaza los usuarios de ejemplo por los usuarios reales de GitHub
+# (sin espacios) ANTES del primer push. El último patrón que coincide es el que manda.
+*                               @USUARIO_MAC
+/backend/                       @USUARIO_MAC
+/database/                      @USUARIO_MAC
+/frontend/templates/            @USUARIO_MAC
+/frontend/static/js/            @USUARIO_MAC
+/frontend/static/mock/          @USUARIO_MAC
+/frontend/prototipo/            @USUARIO_WINDOWS_PANTALLAS
+/frontend/static/css/           @USUARIO_WINDOWS_PANTALLAS
+/docs/bpmn/                     @USUARIO_WINDOWS_PANTALLAS
+/docs/requerimientos/requerimientos.md  @USUARIO_WINDOWS_PANTALLAS @USUARIO_MAC
+/analytics/                     @USUARIO_WINDOWS_DATOS
+/analytics/datos_demo/          @USUARIO_MAC
+/analytics/exportar_csv.sh      @USUARIO_MAC
+/docs/requerimientos/kpi.md     @USUARIO_WINDOWS_DATOS
+/docs/requerimientos/diccionario_datos.md  @USUARIO_WINDOWS_DATOS
+/automation/                    @USUARIO_UBUNTU
+/scripts/                       @USUARIO_MAC @USUARIO_UBUNTU
+/docs/seguridad/                @USUARIO_UBUNTU
+/docs/evidencias/               @USUARIO_UBUNTU
+/docs/api/contrato.md           @USUARIO_MAC @USUARIO_WINDOWS_PANTALLAS

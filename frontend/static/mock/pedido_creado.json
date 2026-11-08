@@ -1,0 +1,13 @@
+{
+  "id": 8,
+  "proveedor_id": 1,
+  "estado": "BORRADOR",
+  "numero_intento": 1,
+  "detalles": [
+    {
+      "producto_id": 1,
+      "cantidad_sugerida": 24,
+      "cantidad_solicitada": 24
+    }
+  ]
+}

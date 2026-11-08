@@ -1,0 +1,31 @@
+# Secretos: nunca al repositorio
+.env
+.env.*
+!.env.example
+
+# Respaldos y bases: nunca al repositorio (van fuera, ver scripts/backup.sh)
+*.dump
+*.backup
+*.sql.gz
+respaldos/
+backups/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Sistema y editores
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Power BI: el .pbix sí se sube; los temporales no
+~$*
+*.pbix.tmp

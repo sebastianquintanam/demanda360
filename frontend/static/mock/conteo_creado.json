@@ -1,0 +1,12 @@
+{
+  "id": 45,
+  "producto_id": 12,
+  "cantidad_contada": 6,
+  "fecha_hora": "2026-11-08T09:15:00-05:00",
+  "producto": {
+    "id": 12,
+    "sku": "LAC-BP-03",
+    "saldo_actual": 6,
+    "estado": "NORMAL"
+  }
+}

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ingresar · Demanda360</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+</head>
+<body class="pagina-login">
+  <main class="tarjeta login">
+    <div class="marca">
+      <div class="marca-icono" aria-hidden="true">◫</div>
+      <div>
+        <div class="marca-nombre">Demanda360</div>
+        <div class="marca-sub">Pinturas By-plus</div>
+      </div>
+    </div>
+    <h1>Ingresar</h1>
+    {% if error %}<p class="alerta alerta-error" role="alert">{{ error }}</p>{% endif %}
+    <form method="post" novalidate>
+      {{ form.hidden_tag() }}
+      <label for="usuario">Usuario</label>
+      {{ form.usuario(id="usuario", autocomplete="username", autofocus=true, required=true) }}
+      <label for="clave">Contraseña</label>
+      {{ form.clave(id="clave", autocomplete="current-password", required=true) }}
+      <button type="submit" class="boton boton-primario">Ingresar</button>
+    </form>
+    <p class="nota">Entorno de demostración · datos simulados</p>
+  </main>
+</body>
+</html>

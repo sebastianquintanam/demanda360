@@ -1,0 +1,9 @@
+{
+  "error": {
+    "codigo": "VALIDACION",
+    "mensaje": "La cantidad entregada debe ser un entero entre 0 y la cantidad solicitada.",
+    "campos": {
+      "cantidad_entregada": "rango"
+    }
+  }
+}

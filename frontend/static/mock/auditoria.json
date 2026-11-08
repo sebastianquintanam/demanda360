@@ -1,0 +1,37 @@
+{
+  "registros": [
+    {
+      "id": 3,
+      "fecha_hora": "2026-11-08T15:42:10-05:00",
+      "usuario": "trabajador",
+      "accion": "VENTA_REGISTRADA",
+      "entidad": "movimientos",
+      "entidad_id": 512,
+      "detalle": {
+        "producto_id": 3,
+        "solicitada": 3,
+        "entregada": 2
+      }
+    },
+    {
+      "id": 2,
+      "fecha_hora": "2026-11-08T15:40:02-05:00",
+      "usuario": "trabajador",
+      "accion": "LOGIN_OK",
+      "entidad": "usuarios",
+      "entidad_id": 2,
+      "detalle": {}
+    },
+    {
+      "id": 1,
+      "fecha_hora": "2026-11-08T09:12:44-05:00",
+      "usuario": "propietario",
+      "accion": "PRODUCTO_CREADO",
+      "entidad": "productos",
+      "entidad_id": 12,
+      "detalle": {
+        "sku": "LAC-BP-03"
+      }
+    }
+  ]
+}
