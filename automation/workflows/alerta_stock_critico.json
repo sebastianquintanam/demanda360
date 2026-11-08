@@ -15,7 +15,7 @@
         0,
         0
       ],
-      "id": "aa2a7e74-ca53-4b0c-8f54-123bd6333eaa",
+      "id": "e8dfa56c-1dd9-4a2d-a259-265794728488",
       "name": "Webhook",
       "webhookId": "160e57a5-3b94-4fca-9827-1a60409a5d51"
     },
@@ -51,7 +51,7 @@
         672,
         0
       ],
-      "id": "f902b01b-2fc3-4338-a0d4-771bc707244e",
+      "id": "8f2f648a-c11c-4703-96d5-3662ae6be31d",
       "name": "Edit Fields"
     },
     {
@@ -61,7 +61,9 @@
         "subject": "={{ $json.asunto }}",
         "emailFormat": "text",
         "text": "={{ $json.mensaje + '\\n\\nID del evento: ' + $json.evento_id }}",
-        "options": {}
+        "options": {
+          "appendAttribution": false
+        }
       },
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
@@ -69,7 +71,7 @@
         896,
         0
       ],
-      "id": "d7f46a80-6807-4ac3-abba-fb70ca50e530",
+      "id": "f43eb1d7-cd39-4b3e-9133-e9285b8cf9cb",
       "name": "Send an Email",
       "webhookId": "8f466b55-ef69-463a-a00a-6efa049aff96",
       "onError": "continueErrorOutput"
@@ -105,7 +107,7 @@
         224,
         0
       ],
-      "id": "ae49daee-9eab-4f05-90e8-aba9c575094f",
+      "id": "337204b6-27f1-4120-b18e-cb89159bccbd",
       "name": "If"
     },
     {
@@ -122,7 +124,7 @@
         1120,
         0
       ],
-      "id": "ab7db44d-27ac-4b81-867b-c22247ba78f8",
+      "id": "bbf437a1-b318-4183-a350-e35c16a6f554",
       "name": "Respond to Webhook"
     },
     {
@@ -139,11 +141,10 @@
         1168,
         144
       ],
-      "id": "7c6f0f1b-e2e3-4a6d-9096-4afb492a477f",
+      "id": "9ea0e4f6-78ff-4fd2-8439-e817b607f3ff",
       "name": "Respuesta error SMTP"
     }
   ],
-  "pinData": {},
   "connections": {
     "Webhook": {
       "main": [
@@ -197,16 +198,16 @@
       ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "812a823f-5981-4fd4-9123-09eb0470e89b",
+  "versionId": "9235478a-0214-42c2-97af-befbba43611b",
   "meta": {
     "templateCredsSetupCompleted": true
   },
   "nodeGroups": [],
-  "id": "Vn4eVIzOuMCpUG5Q",
+  "id": "egiK8y7iQkUQdUOz",
   "tags": []
 }
