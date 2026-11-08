@@ -30,6 +30,20 @@ def create_app(config_object=Config) -> Flask:
     validar_config(app.config)
     _configurar_logs(app)
 
+    @app.before_request
+    def _api_sin_sesion_primero_401():
+        """Se registra ANTES que CSRF: un POST a /api sin sesión (p. ej. sesión vencida)
+        responde 401 y la pantalla lleva al login, en vez de un 400 de CSRF."""
+        from flask_login import current_user
+
+        from .errors import respuesta_error
+
+        if (request.path.startswith("/api/") and request.method not in ("GET", "HEAD", "OPTIONS")
+                and request.routing_exception is None  # ruta o método inexistente: 404 / 405
+                and not current_user.is_authenticated):
+            return respuesta_error(401, "NO_AUTENTICADO", "Debes iniciar sesión.")
+        return None
+
     db.init_app(app)
     csrf.init_app(app)
     login_manager.init_app(app)
@@ -53,10 +67,12 @@ def create_app(config_object=Config) -> Flask:
             return respuesta_error(401, "NO_AUTENTICADO", "Debes iniciar sesión.")
         return redirect(url_for("auth.login", next=request.path))
 
-    from .routes import auth, sistema, vistas
+    from .routes import analitica, auth, inventario, sistema, vistas
 
     app.register_blueprint(auth.bp)
     app.register_blueprint(sistema.bp)
+    app.register_blueprint(inventario.bp)
+    app.register_blueprint(analitica.bp)
     app.register_blueprint(vistas.bp)
     registrar_manejadores(app)
 

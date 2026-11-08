@@ -79,6 +79,16 @@ docker compose exec web flask aplicar-vistas
 - **Los datos demo no se editan a mano:** se cambia `database/seeds/generar_demo.py` y se regenera `10_demo.sql` con `python3 database/seeds/generar_demo.py`.
 - **Volver a cargar desde cero** exige base vacía: `docker compose down -v` borra también n8n (exporta antes tu flujo).
 
+## Alertas a n8n
+
+La venta que cruza el umbral crea la alerta y Flask la envía a n8n después de guardar la venta. Contrato completo: `docs/api/contrato.md`.
+
+```bash
+docker compose exec web flask reintentar-alertas   # reenvía las FALLIDAS (máximo 3 intentos, mismo evento_id)
+```
+
+Evidencia de la sección 5 del plan: con n8n apagado (`docker compose stop n8n`), una venta que cruza el umbral queda guardada y su alerta `FALLIDA`. Se enciende n8n (`docker compose start n8n`), se corre el reintento y pasa a `ENVIADA`.
+
 ## Pruebas
 
 Corren contra un PostgreSQL real (crean y recargan solas la base `demanda360_test`):

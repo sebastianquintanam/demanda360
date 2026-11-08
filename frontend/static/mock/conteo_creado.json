@@ -6,7 +6,10 @@
   "producto": {
     "id": 12,
     "sku": "LAC-BP-03",
+    "saldo_anterior": null,
     "saldo_actual": 6,
-    "estado": "NORMAL"
-  }
+    "umbral_reposicion": 3,
+    "estado": "DATOS_INSUFICIENTES"
+  },
+  "observaciones": null
 }

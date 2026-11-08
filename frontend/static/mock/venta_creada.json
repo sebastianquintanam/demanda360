@@ -1,6 +1,7 @@
 {
   "solicitud_id": 140,
   "movimiento_id": 512,
+  "solicitud_previa_id": null,
   "no_atendida": 1,
   "producto": {
     "id": 3,

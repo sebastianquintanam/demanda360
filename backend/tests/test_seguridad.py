@@ -6,6 +6,7 @@ from flask import Blueprint
 from app import create_app
 from app.config import TestConfig, validar_config
 from app.security import requiere_sesion
+from tests.conftest import aislar_usuario_por_peticion
 
 _bp = Blueprint("pruebas_internas", __name__, url_prefix="/api/_pruebas")
 
@@ -27,6 +28,7 @@ def app(app):
     rutas a una app que ya atendió solicitudes)."""
     propia = create_app(TestConfig)
     propia.register_blueprint(_bp)
+    aislar_usuario_por_peticion(propia)
     return propia
 
 
@@ -69,3 +71,14 @@ def test_secret_key_debil_impide_arrancar(clave):
 
 def test_secret_key_fuerte_permite_arrancar():
     validar_config({"SECRET_KEY": "x" * 48})
+
+
+def test_post_api_sin_sesion_con_csrf_activo_responde_401(app, client):
+    """Sesión vencida: 401 (la pantalla lleva al login), no 400 de CSRF."""
+    app.config["WTF_CSRF_ENABLED"] = True
+    try:
+        r = client.post("/api/_pruebas/eco", json={})
+        assert r.status_code == 401
+        assert r.get_json()["error"]["codigo"] == "NO_AUTENTICADO"
+    finally:
+        app.config["WTF_CSRF_ENABLED"] = False
