@@ -1,0 +1,2 @@
+﻿solicitud_id,fecha_hora,fecha,producto_id,sku,nombre,categoria,cantidad_solicitada,cantidad_entregada,no_atendida,es_regreso,solicitud_previa_id,cuenta_en_kpi2,registrado_por_rol,corte,origen_datos
+90,2026-11-08 15:53:56,2026-11-08,11,SEL-MU-01,Sellador para muros cuñete,Selladores,8,8,0,NO,,SI,trabajador,2026-11-08,SIMULADO

@@ -117,7 +117,7 @@ Hay dos intentos con fecha de envío y sin fecha de respuesta: el pedido 2 está
 
 El cotejo utiliza los valores guardados en `analytics/consultas/verificacion_kpi.xlsx`, hoja `Datos_simulados.`, celdas D16:D20, frente a `analytics/datos_demo/kpi_resumen.csv`. Los cálculos del Excel conservan su precisión; la comparación se hace con la presentación a un decimal del CSV. El registro detallado está preparado para `analytics/consultas/comparacion_kpi_excel_csv.md`.
 
-Las cinco tarjetas se han comprobado visualmente en el informe del rol 3. Quedan pendientes completar las páginas de Power BI, guardar las capturas en `docs/evidencias/` y documentar el flujo de una operación de demostración hasta su exportación y actualización en Power BI.
+Las cinco tarjetas se comprobaron visualmente en el informe de cinco páginas del corte de septiembre. El [índice de evidencias](../evidencias/powerbi/README.md) reúne las capturas del tablero y la prueba separada de la atención 90 con los CSV del corte del 8 de noviembre.
 
 La reposición sugerida de **54 unidades** es una comprobación adicional del ejemplo, no un sexto KPI. Se obtiene con una cobertura de 14 días, usando `máx(0, techo((vendidas + no atendidas) / 30 × 14 − saldo))` para las referencias con datos suficientes. La cantidad manual de la laca transparente no forma parte de ese total.
 

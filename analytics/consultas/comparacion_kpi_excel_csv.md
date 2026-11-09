@@ -41,17 +41,15 @@ Las cuatro tasas se comparan como porcentajes y el KPI 4 como horas. El Excel co
 
 El pedido 2 está **CANCELADO** y el pedido 5 está **ENVIADO**. Ambos carecen de fecha de respuesta y se excluyen del promedio. Solo uno permanece actualmente pendiente. La descripción de «dos enviados sin respuesta» se debe interpretar como dos intentos que tuvieron envío, no como dos pedidos actualmente pendientes.
 
-## Evidencia pendiente de la operación en Power BI
+## Evidencia de la operación en Power BI
 
-Este cotejo corresponde al corte de septiembre. En ese inventario, `SEL-MU-01` conserva saldo **11**. La auditoría del 8 de noviembre describe una operación de demostración de 11 a 3; para acreditar su paso hasta Power BI se necesita la exportación cuyo período y corte realmente incluyan esa operación.
-
-El líder genera los CSV del corte acordado. El rol 3 actualiza Power BI, comprueba el producto y sus indicadores y guarda la evidencia. No se modifica a mano el saldo del CSV ni se mezclan cortes para hacer coincidir una captura.
+El cotejo de indicadores usa los CSV del 30 de septiembre de 2026. La atención 90 se verificó en un proyecto separado con `inventario_actual.csv` y `solicitudes.csv` del corte del 8 de noviembre. Power BI mostró 8 unidades entregadas de `SEL-MU-01`, saldo posterior 3 y estado `CRITICO`. El saldo anterior de 11 se reconstruyó como 3 + 8 y coincide con la auditoría. [Evidencia y CSV de la atención 90](../../docs/evidencias/powerbi/README.md#evidencia-del-movimiento-en-power-bi--criterio-9)
 
 ## Alcance de esta comprobación
 
 Este registro acredita coherencia aritmética entre los CSV y los resultados guardados en Excel. No ejecuta un recálculo dentro de Excel ni las consultas de PostgreSQL. Las pruebas del backend y su resultado se sustentan en las evidencias del líder técnico.
 
-Las capturas revisadas del Resumen muestran los cinco valores esperados. Queda pendiente guardar las evidencias finales de las cinco páginas en `docs/evidencias/`, incorporar el `.pbix` a la entrega y documentar la actualización de una operación.
+El informe final contiene las cinco páginas del corte de septiembre. Las capturas y la evidencia del movimiento del 8 de noviembre se encuentran en el [índice de evidencias de Power BI](../../docs/evidencias/powerbi/README.md).
 
 Los datos son una demostración simulada: no prueban mejoras económicas reales ni constituyen una línea base real de Pinturas By-plus.
 

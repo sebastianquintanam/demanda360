@@ -14,8 +14,16 @@ Las capturas documentan los resultados del tablero de cinco páginas. Resumen y 
 | Baja rotación | 5 de 10 referencias evaluables dan 50,0 %. La laca transparente tiene 3 días de registro y se presenta aparte como datos insuficientes. | [04 · Baja rotación](04_baja_rotacion.png) |
 | Pedidos y proveedores | Los tiempos de 3, 6 y 5 horas dan 4,7 h en promedio. Dos de las tres cadenas confirmadas se resolvieron con el primer proveedor. La tabla distingue los intentos confirmado, cancelado y enviado. | [05 · Pedidos y proveedores](05_pedidos_y_proveedores.png) |
 
-## Evidencia del movimiento en Power BI
+## Evidencia del movimiento en Power BI · Criterio 9
 
-Las cinco capturas acreditan la visualización de los indicadores del corte simulado de septiembre. La prueba de que una operación posterior se refleja en Power BI sigue pendiente. El inventario de septiembre muestra saldo **11** para `SEL-MU-01`. El informe de estado del 8 de noviembre describe una venta de demostración que dejó el saldo en **3**. [CSV de inventario del corte de septiembre](../../../analytics/datos_demo/inventario_actual.csv)
+**Atención 90 · SEL-MU-01 · Corte 08/11/2026 · Datos simulados**
 
-Para cerrar esa prueba se necesita una exportación desde la base que contiene la venta y con un corte que la incluya. El registro de evidencia debe identificar la operación, el SKU, el corte y el saldo de la fila exportada. Luego se refresca una copia del informe con los CSV de ese mismo corte, se verifica el saldo en Disponibilidad y se guarda una captura donde el corte esté identificado. La evidencia se incorpora junto con la referencia a la operación y al archivo exportado.
+La atención se registró el **8 de noviembre de 2026 a las 15:53:56**, hora de Bogotá, para el sellador para muros cuñete. Sebastián entregó la exportación del estado posterior a la atención, obtenida del respaldo de las **16:30** del mismo día. Los dos CSV de esta prueba se cargaron en un proyecto de Power BI separado. [06 · Captura verificada en Power BI](atencion_90/06_atencion_90_2026-11-08.jpg)
+
+| Comprobación | Resultado | Fuente |
+| --- | --- | --- |
+| Atención registrada | Se solicitaron y entregaron **8 unidades**, con **0** unidades sin atender. | [solicitudes.csv](atencion_90/solicitudes.csv), fila con `solicitud_id = 90`. |
+| Inventario posterior | El saldo es **3 unidades**, el umbral es **3** y el estado es **`CRITICO`**. | [inventario_actual.csv](atencion_90/inventario_actual.csv), fila con `sku = SEL-MU-01`. |
+| Conciliación del saldo | El saldo previo reconstruido es **11 = 3 + 8**, coherente con el cambio **11 → 3** registrado en la auditoría de la demo. | Reconciliación de las dos filas y del informe de estado del equipo del 8 de noviembre. |
+
+La captura verifica que Power BI refleja el saldo posterior de esa operación al cargar los dos CSV. Las cinco páginas de indicadores se documentan arriba con el corte simulado de septiembre, del 1 al 30. El corte del 8 de noviembre se usa para esta comprobación puntual del movimiento.
