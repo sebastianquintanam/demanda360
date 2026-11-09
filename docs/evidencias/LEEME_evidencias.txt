@@ -1,0 +1,18 @@
+Demanda360 - Evidencias de pruebas existentes de alertas de stock critico
+Fecha de las pruebas: 8 de noviembre de 2026
+Fuente: capturas compartidas anteriormente en este chat durante la prueba de integracion en el Mac de Quintana.
+Datos: simulados.
+
+01_alerta_fallida_n8n_detenido.png
+La terminal muestra detener n8n y la fila de alertas_enviadas para SEL-MU-01: FALLIDA, intentos=1, por ConnectionError. La captura incluye el reinicio posterior de n8n.
+
+02_reintento_alerta_enviada.png
+La terminal muestra el comando flask reintentar-alertas y luego el estado ENVIADA, intentos=2, para SEL-MU-01.
+
+03_ejecucion_n8n_exitosa.png
+En n8n > Executions, ejecucion Succeeded; ruta verde hasta Send an Email y Respond to Webhook.
+
+04_correo_stock_critico_censurado.png
+Gmail confirma recepcion de alerta para Sellador para muros cunete, SKU SEL-MU-01, existencias=3, umbral=3, entrega estimada=5 dias. Identificador de evento: 361d2e61-8751-4b66-a227-f139b6789f54. El correo y avatar personales fueron ocultados.
+
+NOTA DE SEGURIDAD: no compartir ningun archivo .env, JSON exportado con identificadores o secretos, contrasenas de aplicacion o tokens. Revisar estas imagenes antes de publicarlas; en las capturas de terminal puede aparecer el nombre de usuario de macOS (no una clave). No presentar este paquete como prueba de un correo nuevo sin pie n8n: la captura original conserva el texto de atribucion.
