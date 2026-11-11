@@ -13,7 +13,7 @@ Proyecto integrador · Fundamentos de Sistemas de Información · Universidad EA
 | Automatización | n8n | http://127.0.0.1:5678 |
 | Analítica | Power BI Desktop (lee CSV de `analytics/datos_demo/`) | — |
 
-Especificación completa: [`docs/contexto/plan_mvp_demanda360.md`](docs/contexto/plan_mvp_demanda360.md). Contrato de la API: [`docs/api/contrato.md`](docs/api/contrato.md). Modelo de datos: [`docs/arquitectura/modelo_datos.md`](docs/arquitectura/modelo_datos.md). Sección técnica para el documento final: [`docs/arquitectura/seccion_tecnica.md`](docs/arquitectura/seccion_tecnica.md).
+Especificación completa: [`docs/contexto/plan_mvp_demanda360.md`](docs/contexto/plan_mvp_demanda360.md). Contrato de la API: [`docs/api/contrato.md`](docs/api/contrato.md). Modelo de datos: [`docs/arquitectura/modelo_datos.md`](docs/arquitectura/modelo_datos.md). Sección técnica para el documento final: [`docs/arquitectura/seccion_tecnica.md`](docs/arquitectura/seccion_tecnica.md). Propuesta de IA: [`docs/arquitectura/propuesta_ia.md`](docs/arquitectura/propuesta_ia.md).
 
 ## Estado de la versión 1.0
 
